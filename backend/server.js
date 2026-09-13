@@ -49,13 +49,15 @@ app.use((req, res) => {
 // Centralized Error Handling
 app.use(errorHandler);
 
-// Start Server
-app.listen(PORT, () => {
-  console.log(`====================================================`);
-  console.log(`  Campus Event Management System (CEMS) Backend API`);
-  console.log(`  Server running on http://localhost:${PORT}`);
-  console.log(`  Health check: http://localhost:${PORT}/api/health`);
-  console.log(`====================================================`);
-});
+// Start Server if run directly
+if (require.main === module) {
+  app.listen(PORT, () => {
+    console.log(`====================================================`);
+    console.log(`  Campus Event Management System (CEMS) Backend API`);
+    console.log(`  Server running on http://localhost:${PORT}`);
+    console.log(`  Health check: http://localhost:${PORT}/api/health`);
+    console.log(`====================================================`);
+  });
+}
 
 module.exports = app;
