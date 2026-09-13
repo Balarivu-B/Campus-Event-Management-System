@@ -199,6 +199,58 @@ initConnection();
 function executeMockQuery(sql, params = []) {
   const cleanSql = sql.trim().replace(/\s+/g, ' ');
 
+  // Schema Inspection Handlers
+  if (/^SHOW TABLES/i.test(cleanSql)) {
+    return [[
+      { Tables_in_campus_event_management: 'users' },
+      { Tables_in_campus_event_management: 'events' },
+      { Tables_in_campus_event_management: 'registrations' },
+      { Tables_in_campus_event_management: 'notifications' }
+    ]];
+  }
+
+  if (/^SHOW DATABASES/i.test(cleanSql)) {
+    return [[
+      { Database: 'information_schema' },
+      { Database: 'campus_event_management' },
+      { Database: 'mysql' },
+      { Database: 'performance_schema' }
+    ]];
+  }
+
+  if (/^DESCRIBE users|^DESC users|^SHOW COLUMNS FROM users/i.test(cleanSql)) {
+    return [[
+      { Field: 'id', Type: 'int(11)', Null: 'NO', Key: 'PRI', Default: null, Extra: 'auto_increment' },
+      { Field: 'name', Type: 'varchar(100)', Null: 'NO', Key: '', Default: null, Extra: '' },
+      { Field: 'email', Type: 'varchar(150)', Null: 'NO', Key: 'UNI', Default: null, Extra: '' },
+      { Field: 'password', Type: 'varchar(255)', Null: 'NO', Key: '', Default: null, Extra: '' },
+      { Field: 'role', Type: "enum('STUDENT','ORGANIZER','FACULTY','ADMIN')", Null: 'NO', Key: '', Default: null, Extra: '' },
+      { Field: 'institution', Type: 'varchar(150)', Null: 'YES', Key: '', Default: 'College of Engineering', Extra: '' },
+      { Field: 'department', Type: 'varchar(100)', Null: 'YES', Key: '', Default: null, Extra: '' },
+      { Field: 'phone', Type: 'varchar(20)', Null: 'YES', Key: '', Default: null, Extra: '' },
+      { Field: 'is_active', Type: 'tinyint(1)', Null: 'YES', Key: '', Default: '1', Extra: '' },
+      { Field: 'created_at', Type: 'timestamp', Null: 'YES', Key: '', Default: 'CURRENT_TIMESTAMP', Extra: '' }
+    ]];
+  }
+
+  if (/^DESCRIBE events|^DESC events|^SHOW COLUMNS FROM events/i.test(cleanSql)) {
+    return [[
+      { Field: 'id', Type: 'int(11)', Null: 'NO', Key: 'PRI', Default: null, Extra: 'auto_increment' },
+      { Field: 'title', Type: 'varchar(200)', Null: 'NO', Key: '', Default: null, Extra: '' },
+      { Field: 'description', Type: 'text', Null: 'NO', Key: '', Default: null, Extra: '' },
+      { Field: 'category', Type: 'varchar(50)', Null: 'NO', Key: '', Default: null, Extra: '' },
+      { Field: 'event_date', Type: 'date', Null: 'NO', Key: '', Default: null, Extra: '' },
+      { Field: 'start_time', Type: 'time', Null: 'NO', Key: '', Default: null, Extra: '' },
+      { Field: 'end_time', Type: 'time', Null: 'NO', Key: '', Default: null, Extra: '' },
+      { Field: 'location', Type: 'varchar(150)', Null: 'NO', Key: '', Default: null, Extra: '' },
+      { Field: 'capacity', Type: 'int(11)', Null: 'NO', Key: '', Default: null, Extra: '' },
+      { Field: 'organizer_id', Type: 'int(11)', Null: 'NO', Key: 'MUL', Default: null, Extra: '' },
+      { Field: 'status', Type: "enum('PENDING','APPROVED','REJECTED','CANCELLED','COMPLETED')", Null: 'YES', Key: '', Default: 'PENDING', Extra: '' },
+      { Field: 'rejection_reason', Type: 'text', Null: 'YES', Key: '', Default: null, Extra: '' },
+      { Field: 'created_at', Type: 'timestamp', Null: 'YES', Key: '', Default: 'CURRENT_TIMESTAMP', Extra: '' }
+    ]];
+  }
+
   // 1. SELECT users by email
   if (/SELECT .* FROM users WHERE email = \?/i.test(cleanSql)) {
     const email = (params[0] || '').toLowerCase();
@@ -231,6 +283,10 @@ function executeMockQuery(sql, params = []) {
     let result = [...mockStore.users];
     // Filter params
     let pIdx = 0;
+    const literalRoleMatch = cleanSql.match(/role\s*=\s*['"]([^'"]+)['"]/i);
+    if (literalRoleMatch) {
+      result = result.filter(u => u.role.toUpperCase() === literalRoleMatch[1].toUpperCase());
+    }
     if (/role = \?/i.test(cleanSql)) {
       const role = params[pIdx++];
       result = result.filter(u => u.role === role);
@@ -362,7 +418,7 @@ function executeMockQuery(sql, params = []) {
   }
 
   // 12. SELECT events paginated
-  if (/SELECT .* FROM events e/i.test(cleanSql)) {
+  if (/SELECT .* FROM events/i.test(cleanSql)) {
     let result = [...mockStore.events];
     let pIdx = 0;
     if (/e\.organizer_id = \?/i.test(cleanSql)) {
