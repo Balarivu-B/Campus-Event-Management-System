@@ -253,13 +253,20 @@ function executeMockQuery(sql, params = []) {
 
   // 6. INSERT into users
   if (/INSERT INTO users/i.test(cleanSql)) {
-    const [name, email, password, role, department, phone] = params;
+    let name, email, password, role, institution, department, phone;
+    if (params.length >= 7) {
+      [name, email, password, role, institution, department, phone] = params;
+    } else {
+      [name, email, password, role, department, phone] = params;
+      institution = 'College of Engineering';
+    }
     const newUser = {
       id: mockStore.nextUserId++,
       name,
       email,
       password,
       role,
+      institution: institution || 'College of Engineering',
       department: department || null,
       phone: phone || null,
       is_active: 1,
