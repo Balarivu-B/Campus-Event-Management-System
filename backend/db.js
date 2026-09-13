@@ -31,9 +31,9 @@ const mockStore = {
   nextNotifId: 6
 };
 
-// Seed initial memory store
-async function seedMockStore() {
-  const hash = await bcrypt.hash('password123', 10);
+// Seed initial memory store synchronously
+function seedMockStore() {
+  const hash = bcrypt.hashSync('password123', 10);
   mockStore.users = [
     { id: 1, name: 'System Administrator', email: 'admin@example.com', password: hash, role: 'ADMIN', institution: 'Campus Administration', department: 'Administration', phone: '+1-555-0101', is_active: 1, created_at: new Date().toISOString() },
     { id: 2, name: 'Dr. Sarah Smith', email: 'faculty@example.com', password: hash, role: 'FACULTY', institution: 'College of Engineering', department: 'Computer Science', phone: '+1-555-0102', is_active: 1, created_at: new Date().toISOString() },
