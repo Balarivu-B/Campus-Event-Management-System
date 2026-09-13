@@ -158,8 +158,28 @@ async function getMe(req, res, next) {
   }
 }
 
+// Check registered Faculty for an institution
+async function getFacultyByInstitution(req, res, next) {
+  try {
+    const institution = (req.query.institution || '').trim();
+    if (!institution) {
+      return res.json({ faculty: [] });
+    }
+
+    const [rows] = await pool.query(
+      'SELECT id, name, email, department, institution FROM users WHERE role = ? AND is_active = TRUE AND institution = ?',
+      ['FACULTY', institution]
+    );
+
+    return res.json({ faculty: rows });
+  } catch (error) {
+    next(error);
+  }
+}
+
 module.exports = {
   register,
   login,
-  getMe
+  getMe,
+  getFacultyByInstitution
 };

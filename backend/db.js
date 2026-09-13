@@ -291,9 +291,17 @@ function executeMockQuery(sql, params = []) {
       const role = params[pIdx++];
       result = result.filter(u => u.role === role);
     }
-    if (/is_active = \?/i.test(cleanSql)) {
-      const active = params[pIdx++];
-      result = result.filter(u => u.is_active === active);
+    if (/is_active = \?/i.test(cleanSql) || /is_active = TRUE/i.test(cleanSql)) {
+      if (/is_active = \?/i.test(cleanSql)) {
+        const active = params[pIdx++];
+        result = result.filter(u => u.is_active === active);
+      } else {
+        result = result.filter(u => u.is_active);
+      }
+    }
+    if (/institution = \?/i.test(cleanSql)) {
+      const inst = (params[pIdx++] || '').toLowerCase();
+      result = result.filter(u => (u.institution || '').toLowerCase() === inst);
     }
     if (/LIKE \?/i.test(cleanSql)) {
       const search = (params[pIdx++] || '').replace(/%/g, '').toLowerCase();

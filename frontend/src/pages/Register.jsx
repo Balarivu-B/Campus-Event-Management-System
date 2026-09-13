@@ -1,7 +1,7 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { UserPlus, ShieldAlert, CheckCircle2 } from 'lucide-react';
-import { register } from '../api';
+import { UserPlus, ShieldAlert, CheckCircle2, Building2, UserCheck, AlertCircle } from 'lucide-react';
+import { register, getFacultyByInstitution } from '../api';
 
 export default function Register({ onLoginSuccess }) {
   const [formData, setFormData] = useState({
@@ -17,7 +17,37 @@ export default function Register({ onLoginSuccess }) {
 
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
+  const [matchingFaculty, setMatchingFaculty] = useState([]);
+  const [fetchingFaculty, setFetchingFaculty] = useState(false);
   const navigate = useNavigate();
+
+  // Check matching faculty for the entered/selected institution
+  useEffect(() => {
+    const inst = formData.institution ? formData.institution.trim() : '';
+    if (!inst || inst.length < 3) {
+      setMatchingFaculty([]);
+      return;
+    }
+
+    let isMounted = true;
+    setFetchingFaculty(true);
+    getFacultyByInstitution(inst)
+      .then(data => {
+        if (isMounted) {
+          setMatchingFaculty(data.faculty || []);
+        }
+      })
+      .catch(() => {
+        if (isMounted) setMatchingFaculty([]);
+      })
+      .finally(() => {
+        if (isMounted) setFetchingFaculty(false);
+      });
+
+    return () => {
+      isMounted = false;
+    };
+  }, [formData.institution]);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -31,7 +61,7 @@ export default function Register({ onLoginSuccess }) {
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    if (!formData.name.trim() || !formData.email.trim() || !formData.password) {
+    if (!formData.name.trim() || !formData.email.trim() || !formData.password || !formData.institution.trim()) {
       setError('Please fill out all required fields.');
       return;
     }
@@ -54,6 +84,8 @@ export default function Register({ onLoginSuccess }) {
 
       if (data.user.role === 'ORGANIZER') {
         navigate('/organizer/dashboard');
+      } else if (data.user.role === 'FACULTY') {
+        navigate('/faculty/pending-events');
       } else {
         navigate('/student/dashboard');
       }
@@ -65,7 +97,7 @@ export default function Register({ onLoginSuccess }) {
   };
 
   return (
-    <div className="container" style={{ maxWidth: '560px', padding: '3.5rem 1.5rem' }}>
+    <div className="container" style={{ maxWidth: '580px', padding: '3.5rem 1.5rem' }}>
       <div className="form-card">
         <div style={{ textAlign: 'center', marginBottom: '1.5rem' }}>
           <div style={{
@@ -83,7 +115,7 @@ export default function Register({ onLoginSuccess }) {
           </div>
           <h1 style={{ fontSize: '1.75rem', marginBottom: '0.35rem' }}>Create an Account</h1>
           <p style={{ color: 'var(--text-secondary)', fontSize: '0.9rem' }}>
-            Register to explore events and reserve campus participation seats.
+            Register to organize events, approve proposals, or participate across campus.
           </p>
         </div>
 
@@ -116,7 +148,7 @@ export default function Register({ onLoginSuccess }) {
               name="email"
               type="email"
               className="form-control"
-              placeholder="e.g. student@college.edu"
+              placeholder="e.g. user@college.edu"
               value={formData.email}
               onChange={handleChange}
               required
@@ -124,41 +156,127 @@ export default function Register({ onLoginSuccess }) {
           </div>
 
           <div className="form-group">
-            <label htmlFor="institution">School / College <span style={{ color: 'red' }}>*</span></label>
+            <label htmlFor="role">Register As <span style={{ color: 'red' }}>*</span></label>
             <select
+              id="role"
+              name="role"
+              className="form-control"
+              value={formData.role}
+              onChange={handleChange}
+              style={{ fontWeight: 600 }}
+            >
+              <option value="STUDENT">Student (Discover & Attend Events)</option>
+              <option value="ORGANIZER">Event Organizer (Create Campus Event Proposals)</option>
+              <option value="FACULTY">Faculty Member (Review & Approve Events for Your College)</option>
+            </select>
+          </div>
+
+          {/* School / College Input (Typed text with suggestions) */}
+          <div className="form-group">
+            <label htmlFor="institution">
+              School / College Name <span style={{ color: 'red' }}>*</span>
+            </label>
+            <input
+              list="institution-suggestions"
               id="institution"
               name="institution"
+              type="text"
               className="form-control"
+              placeholder="Type your School or College (e.g. College of Engineering)"
               value={formData.institution}
               onChange={handleChange}
               required
-            >
-              <option value="College of Engineering">College of Engineering</option>
-              <option value="College of Arts & Sciences">College of Arts & Sciences</option>
-              <option value="School of Business">School of Business</option>
-              <option value="School of Medicine & Health">School of Medicine & Health</option>
-              <option value="School of Law">School of Law</option>
-            </select>
+            />
+            <datalist id="institution-suggestions">
+              <option value="College of Engineering" />
+              <option value="College of Arts & Sciences" />
+              <option value="School of Business" />
+              <option value="School of Medicine & Health" />
+              <option value="School of Law" />
+              <option value="School of Design" />
+              <option value="Faculty of Applied Sciences" />
+            </datalist>
+            <span className="form-hint">
+              You can type any custom School / College name or pick a suggestion.
+            </span>
+          </div>
+
+          {/* Institutional Faculty Approval Matching Callout */}
+          <div style={{
+            background: 'var(--bg-secondary)',
+            border: '1px solid var(--border-color)',
+            borderRadius: 'var(--radius-md)',
+            padding: '0.85rem 1rem',
+            marginBottom: '1.25rem',
+            fontSize: '0.85rem'
+          }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '0.35rem', fontWeight: 600 }}>
+              <Building2 size={16} style={{ color: 'var(--primary)' }} />
+              <span>College Approval Scoping for "{formData.institution || 'Your College'}":</span>
+            </div>
+
+            {formData.role === 'ORGANIZER' && (
+              <p style={{ margin: '0.25rem 0', color: 'var(--text-secondary)' }}>
+                Proposals you create will only be reviewable and approvable by faculty registered under <strong>{formData.institution}</strong>.
+              </p>
+            )}
+
+            {formData.role === 'FACULTY' && (
+              <p style={{ margin: '0.25rem 0', color: 'var(--text-secondary)' }}>
+                You will have authority to review, approve, or reject event proposals submitted by organizers from <strong>{formData.institution}</strong>.
+              </p>
+            )}
+
+            {formData.role === 'STUDENT' && (
+              <p style={{ margin: '0.25rem 0', color: 'var(--text-secondary)' }}>
+                You will discover approved campus events and represent <strong>{formData.institution}</strong>.
+              </p>
+            )}
+
+            <div style={{ marginTop: '0.5rem', paddingTop: '0.5rem', borderTop: '1px solid var(--border-color)' }}>
+              {fetchingFaculty ? (
+                <span style={{ color: 'var(--text-secondary)' }}>Checking faculty coordinators...</span>
+              ) : matchingFaculty.length > 0 ? (
+                <div style={{ display: 'flex', alignItems: 'center', gap: '0.4rem', color: 'var(--success)' }}>
+                  <UserCheck size={15} />
+                  <span>
+                    <strong>Registered Faculty Approvers:</strong> {matchingFaculty.map(f => f.name).join(', ')}
+                  </span>
+                </div>
+              ) : (
+                <div style={{ display: 'flex', alignItems: 'center', gap: '0.4rem', color: 'var(--text-secondary)' }}>
+                  <AlertCircle size={15} style={{ color: 'var(--warning)' }} />
+                  <span>
+                    No faculty coordinator registered yet for this college. A faculty member can register under this college to approve event proposals.
+                  </span>
+                </div>
+              )}
+            </div>
           </div>
 
           <div className="form-row">
             <div className="form-group">
               <label htmlFor="department">Department</label>
-              <select
+              <input
+                list="department-suggestions"
                 id="department"
                 name="department"
+                type="text"
                 className="form-control"
+                placeholder="e.g. Computer Science"
                 value={formData.department}
                 onChange={handleChange}
-              >
-                <option value="Computer Science">Computer Science</option>
-                <option value="Information Technology">Information Technology</option>
-                <option value="Electronics & Communication">Electronics & Communication</option>
-                <option value="Mechanical Engineering">Mechanical Engineering</option>
-                <option value="Civil Engineering">Civil Engineering</option>
-                <option value="Business Administration">Business Administration</option>
-                <option value="General Sciences">General Sciences</option>
-              </select>
+              />
+              <datalist id="department-suggestions">
+                <option value="Computer Science" />
+                <option value="Information Technology" />
+                <option value="Electronics & Communication" />
+                <option value="Mechanical Engineering" />
+                <option value="Civil Engineering" />
+                <option value="Business Administration" />
+                <option value="Fine Arts" />
+                <option value="General Sciences" />
+              </datalist>
             </div>
 
             <div className="form-group">
@@ -203,24 +321,6 @@ export default function Register({ onLoginSuccess }) {
                 required
               />
             </div>
-          </div>
-
-          <div className="form-group">
-            <label htmlFor="role">Register As</label>
-            <select
-              id="role"
-              name="role"
-              className="form-control"
-              value={formData.role}
-              onChange={handleChange}
-            >
-              <option value="STUDENT">Student (Default)</option>
-              <option value="ORGANIZER">Event Organizer</option>
-              <option value="FACULTY">Faculty Member</option>
-            </select>
-            <span className="form-hint">
-              Note: Administrator accounts are provisioned securely by existing system administrators.
-            </span>
           </div>
 
           <button

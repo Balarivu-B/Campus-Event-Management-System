@@ -226,3 +226,8 @@ export async function markAllNotificationsRead() {
 export async function getDashboardStats() {
   return request('/stats/dashboard');
 }
+
+// 7. Check Faculty by Institution
+export async function getFacultyByInstitution(institution) {
+  return request(`/auth/faculty-list?institution=${encodeURIComponent(institution)}`);
+}
