@@ -193,7 +193,7 @@ async function initConnection() {
   }
 }
 
-initConnection();
+const readyPromise = initConnection();
 
 // Fallback SQL Executor
 function executeMockQuery(sql, params = []) {
@@ -790,6 +790,7 @@ function executeMockQuery(sql, params = []) {
 // Unified Database Pool Interface
 const db = {
   async query(sql, params = []) {
+    await readyPromise;
     if (useRealMySQL && realPool) {
       try {
         return await realPool.query(sql, params);
@@ -803,6 +804,7 @@ const db = {
   },
 
   async getConnection() {
+    await readyPromise;
     if (useRealMySQL && realPool) {
       try {
         return await realPool.getConnection();
