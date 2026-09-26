@@ -1,0 +1,219 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Review Event Proposal • Faculty Portal</title>
+    <link rel="stylesheet" href="../css/faculty.css">
+    <script src="../js/theme.js"></script>
+    <script src="../js/session.js"></script>
+    <script src="../js/faculty.js"></script>
+</head>
+
+<body>
+
+<div class="layout">
+
+    <!-- SIDEBAR -->
+    <aside class="sidebar">
+        <div class="sidebar-logo">
+            <span>🎪</span> <span>CampusEvent</span>
+        </div>
+
+        <nav>
+            <a href="dashboard.html">
+                <span>🏠</span> <span>Dashboard</span>
+            </a>
+            <a href="event-requests.html" class="active">
+                <span>📋</span> <span>Event Requests</span>
+            </a>
+            <a href="approved-events.html">
+                <span>✅</span> <span>Approved Events</span>
+            </a>
+            <a href="reports.html">
+                <span>📊</span> <span>Reports</span>
+            </a>
+            <a href="notifications.html">
+                <span>🔔</span> <span>Notifications</span>
+            </a>
+            <a href="profile.html">
+                <span>👤</span> <span>Profile</span>
+            </a>
+        </nav>
+
+        <div class="sidebar-footer">
+            <a href="#" onclick="logout()" class="sidebar-logout">
+                <span>🚪</span> <span>Logout</span>
+            </a>
+        </div>
+    </aside>
+
+    <!-- MAIN CONTENT -->
+    <main class="main-content">
+        <header class="topbar">
+            <div class="topbar-left">
+                <h2>Review Event Proposal</h2>
+                <p>Verify club permissions, security requirements, and allocate venues</p>
+            </div>
+
+            <div class="topbar-right">
+                <button class="theme-toggle" id="themeToggle" aria-label="Toggle Theme">
+                    <span class="theme-icon">🌙</span> <span class="theme-label">Dark Mode</span>
+                </button>
+
+                <div class="faculty-info">
+                    <div class="faculty-avatar">R</div>
+                    <span>Faculty Coordinator</span>
+                </div>
+            </div>
+        </header>
+
+        <div style="margin-bottom: 20px;">
+            <a href="event-requests.html" class="btn-secondary">
+                ← Back to All Requests
+            </a>
+        </div>
+
+        <div id="proposalContainer">
+            <!-- Populated dynamically via JS -->
+        </div>
+    </main>
+
+</div>
+
+<script>
+document.addEventListener("DOMContentLoaded", async function () {
+    const urlParams = new URLSearchParams(window.location.search);
+    const selectedId = Number(urlParams.get("id") || localStorage.getItem("facultySelectedRequest") || 1);
+    
+    await loadFacultyRequestsFromDB();
+    let req = getFacultyRequestById(selectedId);
+    
+    // If not in pending requests, check approved events from DB
+    if (!req) {
+        try {
+            const res = await fetch("http://localhost:5000/api/events");
+            const data = await res.json();
+            if (data.success && Array.isArray(data.data)) {
+                const found = data.data.find(e => e.id === selectedId);
+                if (found) {
+                    req = {
+                        id: found.id,
+                        name: found.name,
+                        organizer: found.organizer || "Campus Club",
+                        department: found.institution || "Main Campus",
+                        date: found.date,
+                        time: found.time,
+                        venue: found.venue,
+                        participants: found.totalSeats || found.seats,
+                        type: found.category || "General",
+                        description: found.description,
+                        status: "Approved"
+                    };
+                }
+            }
+        } catch(e) {}
+    }
+    const container = document.getElementById("proposalContainer");
+
+    function renderProposal() {
+        let statusClass = "pending";
+        if (req.status === "Approved") statusClass = "approved";
+        if (req.status === "Rejected") statusClass = "rejected";
+
+        container.innerHTML = `
+            <div class="dashboard-section" style="margin-bottom: 24px;">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; flex-wrap: wrap; gap: 10px;">
+                    <span class="status ${statusClass}" style="font-size: 14px; padding: 6px 16px;">Status: ${req.status}</span>
+                    <span style="font-size: 13px; color: var(--text-muted); font-weight: 700;">Proposal ID: #REQ-2026-${req.id}</span>
+                </div>
+
+                <h1 style="font-size: 28px; font-weight: 800; margin-bottom: 12px; color: var(--text-primary); letter-spacing: -0.5px;">
+                    ${req.name}
+                </h1>
+
+                <div class="profile-meta-grid" style="margin-top: 20px; margin-bottom: 24px;">
+                    <div class="profile-meta-item">
+                        <label>Student Organizing Club</label>
+                        <p>${req.organizer}</p>
+                    </div>
+
+                    <div class="profile-meta-item">
+                        <label>Department Affiliation</label>
+                        <p>${req.department}</p>
+                    </div>
+
+                    <div class="profile-meta-item">
+                        <label>Proposed Date & Duration</label>
+                        <p>📅 ${req.date} (${req.time})</p>
+                    </div>
+
+                    <div class="profile-meta-item">
+                        <label>Proposed Campus Venue</label>
+                        <p>📍 ${req.venue}</p>
+                    </div>
+
+                    <div class="profile-meta-item">
+                        <label>Expected Student Turnout</label>
+                        <p>👥 ${req.participants} Participants</p>
+                    </div>
+
+                    <div class="profile-meta-item">
+                        <label>Event Category / Format</label>
+                        <p>🏷️ ${req.type}</p>
+                    </div>
+                </div>
+
+                <h3 style="font-size: 17px; margin-bottom: 10px; color: var(--text-primary);">📝 Event Purpose & Detailed Proposal</h3>
+                <p style="color: var(--text-secondary); line-height: 1.7; font-size: 14px; margin-bottom: 24px;">
+                    ${req.description}
+                </p>
+
+                <h3 style="font-size: 17px; margin-bottom: 10px; color: var(--text-primary);">🛡️ Safety, Budget & Infrastructure Checklist</h3>
+                <ul style="color: var(--text-secondary); font-size: 13px; line-height: 1.8; padding-left: 20px; margin-bottom: 30px;">
+                    <li>✓ Audio/Visual projector and seminar mic requisition verified</li>
+                    <li>✓ Department staff advisor endorsement letter attached</li>
+                    <li>✓ Fire and electrical safety clearance for auditorium and lab zones</li>
+                    <li>✓ Clean campus protocol and recycling guidelines acknowledged by club lead</li>
+                </ul>
+
+                <div style="border-top: 1px solid var(--border-color); padding-top: 25px;">
+                    <h3 style="font-size: 17px; margin-bottom: 15px; color: var(--text-primary);">⚖️ Faculty Decision</h3>
+                    <div style="display: flex; gap: 14px; flex-wrap: wrap;">
+                        <button class="approve-btn" id="approveBtn">
+                            ✓ Approve Proposal & Grant Clearance
+                        </button>
+                        <button class="reject-btn" id="rejectBtn">
+                            ✕ Reject Proposal
+                        </button>
+                    </div>
+                    <p id="decisionMessage" style="margin-top: 15px; font-weight: 700; font-size: 14px; min-height: 24px;"></p>
+                </div>
+            </div>
+        `;
+
+        document.getElementById("approveBtn").onclick = function () {
+            updateRequestStatus(req.id, "Approved");
+            req.status = "Approved";
+            const msg = document.getElementById("decisionMessage");
+            msg.textContent = "✅ Event proposal officially approved. Venue booking authorized and students notified.";
+            msg.style.color = "#16a34a";
+            setTimeout(renderProposal, 1000);
+        };
+
+        document.getElementById("rejectBtn").onclick = function () {
+            updateRequestStatus(req.id, "Rejected");
+            req.status = "Rejected";
+            const msg = document.getElementById("decisionMessage");
+            msg.textContent = "❌ Event proposal has been rejected.";
+            msg.style.color = "#dc2626";
+            setTimeout(renderProposal, 1000);
+        };
+    }
+
+    renderProposal();
+});
+</script>
+
+</body>
+</html>

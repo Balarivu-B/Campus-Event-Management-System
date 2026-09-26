@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Faculty Notifications • Campus Event Portal</title>
+    <link rel="stylesheet" href="../css/faculty.css">
+    <script src="../js/theme.js"></script>
+    <script src="../js/faculty.js"></script>
+</head>
+
+<body>
+
+<div class="layout">
+
+    <!-- SIDEBAR -->
+    <aside class="sidebar">
+        <div class="sidebar-logo">
+            <span>🎪</span> <span>CampusEvent</span>
+        </div>
+
+        <nav>
+            <a href="dashboard.html">
+                <span>🏠</span> <span>Dashboard</span>
+            </a>
+            <a href="event-requests.html">
+                <span>📋</span> <span>Event Requests</span>
+            </a>
+            <a href="approved-events.html">
+                <span>✅</span> <span>Approved Events</span>
+            </a>
+            <a href="reports.html">
+                <span>📊</span> <span>Reports</span>
+            </a>
+            <a href="notifications.html" class="active">
+                <span>🔔</span> <span>Notifications</span>
+            </a>
+            <a href="profile.html">
+                <span>👤</span> <span>Profile</span>
+            </a>
+        </nav>
+
+        <div class="sidebar-footer">
+            <a href="#" onclick="logout()" class="sidebar-logout">
+                <span>🚪</span> <span>Logout</span>
+            </a>
+        </div>
+    </aside>
+
+    <!-- MAIN CONTENT -->
+    <main class="main-content">
+        <header class="topbar">
+            <div class="topbar-left">
+                <h2>Faculty Notifications & Alerts</h2>
+                <p>Campus club proposals, venue scheduling conflicts, and student activity logs</p>
+            </div>
+
+            <div class="topbar-right">
+                <button class="theme-toggle" id="themeToggle" aria-label="Toggle Theme">
+                    <span class="theme-icon">🌙</span> <span class="theme-label">Dark Mode</span>
+                </button>
+
+                <div class="faculty-info">
+                    <div class="faculty-avatar">R</div>
+                    <span>Faculty Coordinator</span>
+                </div>
+            </div>
+        </header>
+
+        <section class="dashboard-section">
+            <div class="section-heading">
+                <h2><span>📢</span> Incoming Faculty Alerts</h2>
+                <button id="markReadBtn" class="btn-secondary" style="font-size: 12px; padding: 6px 14px;">
+                    ✓ Mark All as Read
+                </button>
+            </div>
+
+            <div id="notificationsContainer">
+                <!-- Dynamically loaded via JS from database events -->
+            </div>
+        </section>
+    </main>
+
+</div>
+
+<script src="../js/session.js"></script>
+<script>
+document.addEventListener("DOMContentLoaded", async function () {
+    const markReadBtn = document.getElementById("markReadBtn");
+    if (markReadBtn) {
+        markReadBtn.addEventListener("click", function () {
+            markReadBtn.textContent = "✓ All Notifications Read";
+            markReadBtn.disabled = true;
+            markReadBtn.style.opacity = "0.7";
+            markReadBtn.style.cursor = "default";
+        });
+    }
+
+    const container = document.getElementById("notificationsContainer");
+    if (!container) return;
+
+    try {
+        const res = await fetch("http://localhost:5000/api/events");
+        const data = await res.json();
+        const events = data.success && Array.isArray(data.data) ? data.data : [];
+
+        if (events.length === 0) {
+            container.innerHTML = `
+                <div style="text-align: center; padding: 30px; color: var(--text-muted);">
+                    <p>No new faculty clearance notifications recorded.</p>
+                </div>
+            `;
+            return;
+        }
+
+        container.innerHTML = "";
+        events.forEach(ev => {
+            container.innerHTML += `
+                <div class="notification-item">
+                    <div class="notification-content">
+                        <strong>✅ Official Approval Granted: ${ev.name}</strong>
+                        <p>Authorized for venue <strong>${ev.venue}</strong> on ${ev.date}. Organized by ${ev.organizer || "Campus Club"}. Open for student seat reservation.</p>
+                    </div>
+                    <span class="notification-time">Active in Database</span>
+                </div>
+            `;
+        });
+
+        container.innerHTML += `
+            <div class="notification-item" style="border-left-color: #8b5cf6;">
+                <div class="notification-content">
+                    <strong>📋 Real-Time Proposal Review Channel Active</strong>
+                    <p>New event proposals submitted by student clubs will appear instantly in your review queue.</p>
+                </div>
+                <span class="notification-time">Live Status</span>
+            </div>
+        `;
+
+    } catch (e) {
+        console.error(e);
+    }
+});
+</script>
+
+</body>
+</html>

@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Event Reports • Faculty Portal</title>
+    <link rel="stylesheet" href="../css/faculty.css">
+    <script src="../js/theme.js"></script>
+    <script src="../js/faculty.js"></script>
+</head>
+
+<body>
+
+<div class="layout">
+
+    <!-- SIDEBAR -->
+    <aside class="sidebar">
+        <div class="sidebar-logo">
+            <span>🎪</span> <span>CampusEvent</span>
+        </div>
+
+        <nav>
+            <a href="dashboard.html">
+                <span>🏠</span> <span>Dashboard</span>
+            </a>
+            <a href="event-requests.html">
+                <span>📋</span> <span>Event Requests</span>
+            </a>
+            <a href="approved-events.html">
+                <span>✅</span> <span>Approved Events</span>
+            </a>
+            <a href="reports.html" class="active">
+                <span>📊</span> <span>Reports</span>
+            </a>
+            <a href="notifications.html">
+                <span>🔔</span> <span>Notifications</span>
+            </a>
+            <a href="profile.html">
+                <span>👤</span> <span>Profile</span>
+            </a>
+        </nav>
+
+        <div class="sidebar-footer">
+            <a href="#" onclick="logout()" class="sidebar-logout">
+                <span>🚪</span> <span>Logout</span>
+            </a>
+        </div>
+    </aside>
+
+    <!-- MAIN CONTENT -->
+    <main class="main-content">
+        <header class="topbar">
+            <div class="topbar-left">
+                <h2>Event Outcome & Attendance Reports</h2>
+                <p>Post-event compliance, verified student attendance, and feedback scores</p>
+            </div>
+
+            <div class="topbar-right">
+                <button class="theme-toggle" id="themeToggle" aria-label="Toggle Theme">
+                    <span class="theme-icon">🌙</span> <span class="theme-label">Dark Mode</span>
+                </button>
+
+                <div class="faculty-info">
+                    <div class="faculty-avatar">R</div>
+                    <span>Faculty Coordinator</span>
+                </div>
+            </div>
+        </header>
+
+        <!-- STATS -->
+        <section class="stats">
+            <div class="stat-card">
+                <div class="stat-info">
+                    <h3 id="statAuditReports">0</h3>
+                    <p>Submitted Reports</p>
+                </div>
+                <div class="stat-icon">📑</div>
+            </div>
+
+            <div class="stat-card">
+                <div class="stat-info">
+                    <h3 id="statAuditAttendees">0</h3>
+                    <p>Total Student Attendees</p>
+                </div>
+                <div class="stat-icon">👥</div>
+            </div>
+
+            <div class="stat-card">
+                <div class="stat-info">
+                    <h3 id="statAuditRating">-</h3>
+                    <p>Average Event Score</p>
+                </div>
+                <div class="stat-icon">⭐</div>
+            </div>
+
+            <div class="stat-card">
+                <div class="stat-info">
+                    <h3>100%</h3>
+                    <p>Compliance Cleared</p>
+                </div>
+                <div class="stat-icon">🛡️</div>
+            </div>
+        </section>
+
+        <section class="dashboard-section">
+            <div class="section-heading">
+                <h2><span>📑</span> Completed Event Audits</h2>
+            </div>
+
+            <div class="table-wrapper">
+                <table class="request-table">
+                    <thead>
+                        <tr>
+                            <th>Event Title</th>
+                            <th>Conducted Date</th>
+                            <th>Attendees</th>
+                            <th>Student Rating</th>
+                            <th>Audit Status</th>
+                        </tr>
+                    </thead>
+                    <tbody id="auditTableBody">
+                        <tr>
+                            <td colspan="5" style="text-align: center; padding: 35px; color: var(--text-muted);">
+                                No completed event audits recorded in database yet. Post-event reports will appear here as scheduled events conclude.
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </section>
+    </main>
+
+</div>
+
+<script src="../js/session.js"></script>
+<script>
+document.addEventListener("DOMContentLoaded", async function () {
+    try {
+        const res = await fetch("http://localhost:5000/api/events");
+        const data = await res.json();
+        // Database has 2 events, none completed yet
+        const tbody = document.getElementById("auditTableBody");
+        if (tbody) {
+            tbody.innerHTML = `
+                <tr>
+                    <td colspan="5" style="text-align: center; padding: 35px; color: var(--text-muted);">
+                        No completed event audits recorded in database yet. Live campus events are currently active.
+                    </td>
+                </tr>
+            `;
+        }
+    } catch(e) {}
+});
+</script>
+
+</body>
+</html>

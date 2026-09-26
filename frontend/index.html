@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Campus Event Management System</title>
+    <link rel="stylesheet" href="css/style.css">
+    <script src="js/theme.js"></script>
+</head>
+
+<body>
+
+<header class="main-header">
+    <a href="index.html" class="logo">
+        <span>🎪</span> CampusEvent
+        <span class="logo-badge">Portal</span>
+    </a>
+
+    <nav>
+        <a href="index.html">Home</a>
+        <a href="#about">About</a>
+        <a href="#features">Features</a>
+        <button class="theme-toggle" id="themeToggle" aria-label="Toggle Theme">
+            <span class="theme-icon">🌙</span> <span class="theme-label">Dark Mode</span>
+        </button>
+        <a href="login.html" class="login-btn">Portal Login</a>
+    </nav>
+</header>
+
+<section class="hero">
+    <div class="hero-content">
+        <div class="hero-pill">
+            <span>✨</span> 2026 Academic Season • Live Campus Portal
+        </div>
+
+        <h1>
+            Campus Event<br>
+            <span>Management System</span>
+        </h1>
+
+        <p>
+            Discover exciting campus events, register seamlessly with a single click, track your schedule, and stay fully connected with your university community.
+        </p>
+
+        <div class="hero-actions">
+            <a href="login.html" class="primary-btn">
+                <span>🚀</span> Get Started Now
+            </a>
+            <a href="#features" class="secondary-btn">
+                <span>🔍</span> Explore Features
+            </a>
+        </div>
+
+        <div class="hero-stats">
+            <div class="stat-item">
+                <h4 id="heroEventsCount">2</h4>
+                <p>Live Campus Events</p>
+            </div>
+            <div class="stat-item">
+                <h4>100%</h4>
+                <p>Digital Registration</p>
+            </div>
+            <div class="stat-item">
+                <h4>24/7</h4>
+                <p>Live Campus Portal</p>
+            </div>
+        </div>
+    </div>
+</section>
+
+<section id="features" class="section">
+    <div class="section-tag">Key Highlights</div>
+    <h2>Everything You Need for Campus Life</h2>
+    <p class="section-subtext">A unified platform built specifically for students to explore, engage, and excel in collegiate activities.</p>
+
+    <div class="feature-container">
+        <div class="feature-card">
+            <div class="feature-icon">📅</div>
+            <h3>Upcoming Events</h3>
+            <p>Browse through technical hackathons, coding workshops, cultural fests, and guest seminars in real-time.</p>
+        </div>
+
+        <div class="feature-card">
+            <div class="feature-icon">⚡</div>
+            <h3>Instant Registration</h3>
+            <p>One-click event registration with instant seat reservation and confirmation pass directly in your portal.</p>
+        </div>
+
+        <div class="feature-card">
+            <div class="feature-icon">🔔</div>
+            <h3>Live Notifications</h3>
+            <p>Receive immediate alerts for venue updates, timing adjustments, registration deadlines, and reminders.</p>
+        </div>
+
+        <div class="feature-card">
+            <div class="feature-icon">⭐</div>
+            <h3>Feedback & Ratings</h3>
+            <p>Share your experiences, rate speakers and workshops, and help shape future campus events.</p>
+        </div>
+    </div>
+</section>
+
+<section id="about" class="section" style="background: var(--bg-card); border-top: 1px solid var(--border-color);">
+    <div class="section-tag">About The System</div>
+    <h2>Empowering College Engagement</h2>
+    <p class="section-subtext">Designed to streamline campus communication and participation across all college departments.</p>
+
+    <div class="about-grid">
+        <div class="about-card">
+            <div class="about-item">
+                <div class="about-item-icon">🎯</div>
+                <div>
+                    <h4 style="margin-bottom: 5px;">Unified Schedule</h4>
+                    <p style="color: var(--text-secondary); font-size: 14px;">No more missing notices on bulletin boards. All departmental and inter-college events are aggregated in one place.</p>
+                </div>
+            </div>
+            <div class="about-item">
+                <div class="about-item-icon">🛡️</div>
+                <div>
+                    <h4 style="margin-bottom: 5px;">Verified Student Access</h4>
+                    <p style="color: var(--text-secondary); font-size: 14px;">Secure login credentials for registered students with instant access to their registered events history.</p>
+                </div>
+            </div>
+            <div class="about-item" style="margin-bottom: 0;">
+                <div class="about-item-icon">🌓</div>
+                <div>
+                    <h4 style="margin-bottom: 5px;">Modern Light & Dark Themes</h4>
+                    <p style="color: var(--text-secondary); font-size: 14px;">Designed with accessibility in mind, supporting both light and dark themes with persistent preference storage.</p>
+                </div>
+            </div>
+        </div>
+
+        <div style="text-align: left; padding: 20px;">
+            <h3 style="font-size: 26px; margin-bottom: 16px;">Ready to participate in upcoming events?</h3>
+            <p style="color: var(--text-secondary); margin-bottom: 25px; line-height: 1.7;">
+                Sign in with your student credentials or explore the portal right away. Check out workshops, technical fests, and expert seminars happening this week!
+            </p>
+            <a href="login.html" class="primary-btn">
+                Access Student Portal →
+            </a>
+        </div>
+    </div>
+</section>
+
+<footer>
+    <div class="footer-content">
+        <div class="logo" style="color: #ffffff;">
+            <span>🎪</span> CampusEvent
+        </div>
+        <div class="footer-copy">
+            © 2026 Campus Event Management System. All rights reserved.
+        </div>
+        <div class="footer-status">
+            <span>●</span> All Systems Operational
+        </div>
+    </div>
+</footer>
+
+<script>
+    // Dynamically fetch live database event count
+    fetch("http://localhost:5000/api/events")
+        .then(res => res.json())
+        .then(data => {
+            if (data.success && Array.isArray(data.data)) {
+                const el = document.getElementById("heroEventsCount");
+                if (el) el.textContent = data.data.length;
+            }
+        })
+        .catch(() => {});
+</script>
+</body>
+</html>

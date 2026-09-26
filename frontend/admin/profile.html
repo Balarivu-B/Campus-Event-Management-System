@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Administrator Profile • Admin Portal</title>
+    <link rel="stylesheet" href="../css/admin.css">
+    <script src="../js/theme.js"></script>
+</head>
+<body>
+
+<div class="admin-layout">
+    <!-- SIDEBAR -->
+    <aside class="sidebar">
+        <div class="sidebar-header">
+            <div class="brand-icon">🛡️</div>
+            <div class="brand-text">
+                <h2>CampusEvent</h2>
+                <span class="role-badge">Super Admin</span>
+            </div>
+        </div>
+
+        <nav>
+            <a href="dashboard.html">
+                <span class="nav-icon">📊</span>
+                <span>Dashboard</span>
+            </a>
+            <a href="students.html">
+                <span class="nav-icon">🎓</span>
+                <span>Students</span>
+            </a>
+            <a href="faculty.html">
+                <span class="nav-icon">👨‍🏫</span>
+                <span>Faculty</span>
+            </a>
+            <a href="organizers.html">
+                <span class="nav-icon">🧑‍💼</span>
+                <span>Organizers</span>
+            </a>
+            <a href="events.html">
+                <span class="nav-icon">📅</span>
+                <span>Events</span>
+            </a>
+            <a href="reports.html">
+                <span class="nav-icon">📈</span>
+                <span>Reports</span>
+            </a>
+            <a href="notifications.html">
+                <span class="nav-icon">🔔</span>
+                <span>Notifications</span>
+            </a>
+            <a href="profile.html" class="active">
+                <span class="nav-icon">👤</span>
+                <span>Profile</span>
+            </a>
+        </nav>
+
+        <button onclick="logout()" class="logout-btn">
+            <span>🚪</span>
+            <span>Sign Out</span>
+        </button>
+    </aside>
+
+    <!-- MAIN CONTENT -->
+    <main class="main-content">
+        <header class="topbar">
+            <div class="topbar-title">
+                <h1>Administrator Profile</h1>
+                <p>System account specifications, authorization credentials, and security settings</p>
+            </div>
+
+            <div class="topbar-actions">
+                <button class="theme-toggle" id="themeToggle" aria-label="Toggle Theme">
+                    <span class="theme-icon">🌙</span>
+                    <span class="theme-label">Dark Mode</span>
+                </button>
+                <div class="admin-user-pill">
+                    <div class="admin-avatar">🛡️</div>
+                    <div class="admin-info">
+                        <span class="admin-name">System Admin</span>
+                        <span class="admin-role">Super Administrator</span>
+                    </div>
+                </div>
+            </div>
+        </header>
+
+        <section class="profile-card">
+            <div class="profile-header-badge">
+                <div class="profile-large-avatar">🛡️</div>
+                <div>
+                    <h2 style="margin: 0 0 4px 0; font-size: 20px;">System Administrator</h2>
+                    <p style="margin: 0; color: var(--text-secondary); font-size: 13.5px;">Campus Event Management Platform Oversight</p>
+                    <span class="status approved" style="margin-top: 8px;">Root Authority Active</span>
+                </div>
+            </div>
+
+            <div class="profile-details-grid">
+                <div class="profile-field">
+                    <label>Official Name</label>
+                    <div class="value" id="adminProfName">Administrator</div>
+                </div>
+
+                <div class="profile-field">
+                    <label>Sign-in Email</label>
+                    <div class="value" id="adminProfEmail">admin@gmail.com</div>
+                </div>
+
+                <div class="profile-field">
+                    <label>Assigned Role</label>
+                    <div class="value" id="adminProfRole">Super Administrator</div>
+                </div>
+
+                <div class="profile-field">
+                    <label>Host Institution</label>
+                    <div class="value">Main College Campus</div>
+                </div>
+
+                <div class="profile-field">
+                    <label>Access Scope</label>
+                    <div class="value">Full System Read / Write</div>
+                </div>
+
+                <div class="profile-field">
+                    <label>Password</label>
+                    <div class="value">••••••••</div>
+                </div>
+            </div>
+
+            <div style="display: flex; gap: 12px; flex-wrap: wrap;">
+                <button class="btn btn-outline" onclick="showAdminToast('Account preferences are up to date.')">
+                    ⚙️ Account Settings
+                </button>
+                <button class="btn btn-danger" onclick="logout()">
+                    🚪 Sign Out
+                </button>
+            </div>
+        </section>
+    </main>
+</div>
+
+<script src="../js/session.js"></script>
+<script src="../js/admin.js"></script>
+</body>
+</html>

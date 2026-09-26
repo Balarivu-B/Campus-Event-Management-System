@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Event Details • Organizer Portal</title>
+    <link rel="stylesheet" href="../css/organizer.css">
+    <script src="../js/theme.js"></script>
+    <script src="../js/session.js"></script>
+    <script src="../js/organizer.js"></script>
+</head>
+
+<body>
+
+<div class="layout">
+
+    <!-- SIDEBAR -->
+    <aside class="sidebar">
+        <div class="sidebar-logo">
+            <span>🎪</span> <span>CampusEvent</span>
+        </div>
+
+        <nav>
+            <a href="dashboard.html">
+                <span>🏠</span> <span>Dashboard</span>
+            </a>
+            <a href="create-event.html">
+                <span>➕</span> <span>Create Event</span>
+            </a>
+            <a href="my-events.html" class="active">
+                <span>📅</span> <span>My Events</span>
+            </a>
+            <a href="registrations.html">
+                <span>👥</span> <span>Registrations</span>
+            </a>
+            <a href="notifications.html">
+                <span>🔔</span> <span>Notifications</span>
+            </a>
+            <a href="profile.html">
+                <span>👤</span> <span>Profile</span>
+            </a>
+        </nav>
+
+        <div class="sidebar-footer">
+            <a href="#" onclick="logout()" class="sidebar-logout">
+                <span>🚪</span> <span>Logout</span>
+            </a>
+        </div>
+    </aside>
+
+    <!-- MAIN CONTENT -->
+    <main class="main-content">
+        <header class="topbar">
+            <div class="topbar-left">
+                <h2>Event Specifications</h2>
+                <p>Complete event schedule, venue authorization, and registration metrics</p>
+            </div>
+
+            <div class="topbar-right">
+                <button class="theme-toggle" id="themeToggle" aria-label="Toggle Theme">
+                    <span class="theme-icon">🌙</span> <span class="theme-label">Dark Mode</span>
+                </button>
+
+                <div class="organizer-info">
+                    <div class="organizer-avatar">A</div>
+                    <span>Event Organizer</span>
+                </div>
+            </div>
+        </header>
+
+        <div style="margin-bottom: 20px;">
+            <a href="my-events.html" class="btn-secondary">
+                ← Back to All My Events
+            </a>
+        </div>
+
+        <div id="eventDetailsContainer">
+            <!-- Populated dynamically via JS -->
+        </div>
+    </main>
+
+</div>
+
+<script>
+document.addEventListener("DOMContentLoaded", async function () {
+    await loadOrganizerEventsFromDB();
+    const selectedId = localStorage.getItem("organizerEvent") || 1;
+    const event = getOrganizerEventById(selectedId);
+    const container = document.getElementById("eventDetailsContainer");
+
+    if (!event) {
+        container.innerHTML = `
+            <div class="dashboard-section" style="text-align: center; padding: 40px;">
+                <h3>Event Not Found</h3>
+                <p style="color: var(--text-muted); margin-top: 8px;">The requested event record could not be loaded.</p>
+                <a href="my-events.html" class="btn-secondary" style="margin-top: 15px; display: inline-flex;">Back to Events</a>
+            </div>
+        `;
+        return;
+    }
+
+    let statusClass = "pending";
+    if (event.status === "Approved") statusClass = "approved";
+    if (event.status === "Rejected") statusClass = "rejected";
+
+    const registrations = event.registrations || 0;
+    const capacity = event.capacity || 100;
+    const remaining = Math.max(0, capacity - registrations);
+    const percentFilled = Math.min(100, Math.round((registrations / capacity) * 100));
+
+    container.innerHTML = `
+        <div class="dashboard-section" style="margin-bottom: 24px;">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; flex-wrap: wrap; gap: 10px;">
+                <span class="status ${statusClass}" style="font-size: 13px; padding: 6px 14px;">Status: ${event.status}</span>
+                <span style="font-size: 13px; color: var(--text-muted); font-weight: 700;">Event ID: #EVT-${event.id}</span>
+            </div>
+
+            <h1 style="font-size: 30px; font-weight: 800; color: var(--text-primary); letter-spacing: -0.5px; margin-bottom: 15px;">
+                ${event.name}
+            </h1>
+
+            <div class="profile-meta-grid" style="margin-bottom: 24px;">
+                <div class="profile-meta-item">
+                    <label>Category</label>
+                    <p>🏷️ ${event.category || "General"}</p>
+                </div>
+
+                <div class="profile-meta-item">
+                    <label>Date & Time</label>
+                    <p>📅 ${event.dateDisplay || event.date} • ⏰ ${event.time || "10:00 AM"}</p>
+                </div>
+
+                <div class="profile-meta-item">
+                    <label>Campus Venue</label>
+                    <p>📍 ${event.venue}</p>
+                </div>
+
+                <div class="profile-meta-item">
+                    <label>Seat Capacity & Fill Rate</label>
+                    <p>👥 ${registrations} registered (${remaining} seats open)</p>
+                </div>
+            </div>
+
+            <div style="margin-bottom: 24px; background: var(--bg-card-subtle); padding: 18px; border-radius: 14px;">
+                <div style="display: flex; justify-content: space-between; font-size: 13px; font-weight: 700; margin-bottom: 8px;">
+                    <span>Registration Fill Rate</span>
+                    <span>${percentFilled}% Occupied (${registrations} / ${capacity})</span>
+                </div>
+                <div style="width: 100%; height: 10px; background: var(--border-color); border-radius: 999px; overflow: hidden;">
+                    <div style="width: ${percentFilled}%; height: 100%; background: var(--primary); border-radius: 999px;"></div>
+                </div>
+            </div>
+
+            <h3 style="font-size: 18px; margin-bottom: 12px; color: var(--text-primary);">📖 Event Description</h3>
+            <p style="color: var(--text-secondary); line-height: 1.7; font-size: 15px; margin-bottom: 28px;">
+                ${event.description || "No detailed description provided."}
+            </p>
+
+            <div style="display: flex; gap: 12px; flex-wrap: wrap; border-top: 1px solid var(--border-color); padding-top: 20px;">
+                <button class="primary-btn" onclick="editEvent(${event.id})">
+                    <span>✏️</span> Edit Event Details
+                </button>
+                <a href="registrations.html" class="btn-secondary" style="padding: 12px 20px;">
+                    <span>👥</span> View Registered Attendees Roster
+                </a>
+            </div>
+        </div>
+    `;
+});
+</script>
+
+</body>
+</html>

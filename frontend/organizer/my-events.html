@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Events • Organizer Portal</title>
+    <link rel="stylesheet" href="../css/organizer.css">
+    <script src="../js/theme.js"></script>
+    <script src="../js/session.js"></script>
+    <script src="../js/organizer.js"></script>
+</head>
+
+<body>
+
+<div class="layout">
+
+    <!-- SIDEBAR -->
+    <aside class="sidebar">
+        <div class="sidebar-logo">
+            <span>🎪</span> <span>CampusEvent</span>
+        </div>
+
+        <nav>
+            <a href="dashboard.html">
+                <span>🏠</span> <span>Dashboard</span>
+            </a>
+            <a href="create-event.html">
+                <span>➕</span> <span>Create Event</span>
+            </a>
+            <a href="my-events.html" class="active">
+                <span>📅</span> <span>My Events</span>
+            </a>
+            <a href="registrations.html">
+                <span>👥</span> <span>Registrations</span>
+            </a>
+            <a href="notifications.html">
+                <span>🔔</span> <span>Notifications</span>
+            </a>
+            <a href="profile.html">
+                <span>👤</span> <span>Profile</span>
+            </a>
+        </nav>
+
+        <div class="sidebar-footer">
+            <a href="#" onclick="logout()" class="sidebar-logout">
+                <span>🚪</span> <span>Logout</span>
+            </a>
+        </div>
+    </aside>
+
+    <!-- MAIN CONTENT -->
+    <main class="main-content">
+        <header class="topbar">
+            <div class="topbar-left">
+                <h2>My Managed Events</h2>
+                <p>Track proposal status, edit logistics, and inspect participant registrations</p>
+            </div>
+
+            <div class="topbar-right">
+                <button class="theme-toggle" id="themeToggle" aria-label="Toggle Theme">
+                    <span class="theme-icon">🌙</span> <span class="theme-label">Dark Mode</span>
+                </button>
+
+                <div class="organizer-info">
+                    <div class="organizer-avatar">A</div>
+                    <span>Event Organizer</span>
+                </div>
+            </div>
+        </header>
+
+        <section class="dashboard-section">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 22px; flex-wrap: wrap; gap: 12px;">
+                <input
+                    type="text"
+                    id="searchEventsInput"
+                    placeholder="Search your events by name or venue..."
+                    style="max-width: 320px; padding: 10px 14px; border: 1px solid var(--border-color); border-radius: 10px; background: var(--input-bg); color: var(--text-primary); font-family: inherit;"
+                    onkeyup="renderEventCards()"
+                >
+
+                <div style="display: flex; gap: 10px; align-items: center;">
+                    <span id="eventsCountBadge" style="font-size: 13px; font-weight: 700; color: var(--text-secondary);"></span>
+                    <button class="primary-btn" onclick="createEvent()" style="padding: 9px 18px; font-size: 13px;">
+                        <span>➕</span> Create Event
+                    </button>
+                </div>
+            </div>
+
+            <div id="eventList" class="event-grid">
+                <!-- Rendered dynamically via JS -->
+            </div>
+        </section>
+    </main>
+
+</div>
+
+<script>
+function renderEventCards() {
+    const events = getOrganizerEvents();
+    const container = document.getElementById("eventList");
+    const countBadge = document.getElementById("eventsCountBadge");
+    const searchVal = (document.getElementById("searchEventsInput").value || "").toLowerCase().trim();
+
+    const filtered = events.filter(e =>
+        e.name.toLowerCase().includes(searchVal) ||
+        (e.venue && e.venue.toLowerCase().includes(searchVal)) ||
+        (e.category && e.category.toLowerCase().includes(searchVal))
+    );
+
+    if (countBadge) {
+        countBadge.textContent = `${filtered.length} of ${events.length} Events`;
+    }
+
+    if (!container) return;
+
+    if (filtered.length === 0) {
+        container.innerHTML = `
+            <div style="grid-column: 1 / -1; text-align: center; padding: 40px; color: var(--text-muted);">
+                <h3>No Matching Events Found</h3>
+                <p style="margin-top: 8px;">Try modifying your search or create a new event proposal.</p>
+            </div>
+        `;
+        return;
+    }
+
+    container.innerHTML = "";
+    filtered.forEach(event => {
+        let statusClass = "pending";
+        if (event.status === "Approved") statusClass = "approved";
+        if (event.status === "Rejected") statusClass = "rejected";
+
+        container.innerHTML += `
+            <div class="event-card">
+                <div>
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
+                        <span class="status ${statusClass}">${event.status}</span>
+                        <span style="font-size: 12px; color: var(--text-muted); font-weight: 700;">${event.category || "General"}</span>
+                    </div>
+
+                    <h3>${event.name}</h3>
+
+                    <div style="margin-bottom: 15px;">
+                        <p>📅 <strong>${event.dateDisplay || event.date}</strong></p>
+                        <p>⏰ ${event.time || "Scheduled"}</p>
+                        <p>📍 ${event.venue}</p>
+                        <p>👥 Capacity: ${event.capacity} seats</p>
+                        <p>📝 Registrations: <strong>${event.registrations || 0}</strong> students</p>
+                    </div>
+                </div>
+
+                <div style="display: flex; gap: 8px; margin-top: 15px;">
+                    <button class="view-btn" onclick="viewEvent(${event.id})" style="flex: 1;">
+                        View
+                    </button>
+                    <button class="edit-btn" onclick="editEvent(${event.id})">
+                        Edit
+                    </button>
+                    <button class="delete-btn" onclick="confirmDelete(${event.id})">
+                        Delete
+                    </button>
+                </div>
+            </div>
+        `;
+    });
+}
+
+function confirmDelete(id) {
+    if (confirm("Are you sure you want to delete this event from your catalog?")) {
+        deleteOrganizerEvent(id);
+        renderEventCards();
+    }
+}
+
+document.addEventListener("DOMContentLoaded", async function () {
+    await loadOrganizerEventsFromDB();
+    renderEventCards();
+});
+</script>
+
+</body>
+</html>

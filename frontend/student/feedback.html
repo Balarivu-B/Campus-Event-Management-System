@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Event Feedback • Campus Event Portal</title>
+    <link rel="stylesheet" href="../css/student.css">
+    <script src="../js/theme.js"></script>
+    <script src="../js/session.js"></script>
+    <script src="../js/events-data.js"></script>
+</head>
+
+<body>
+
+<div class="layout">
+
+    <!-- SIDEBAR -->
+    <aside class="sidebar">
+        <div class="sidebar-logo">
+            <span>🎪</span> <span>CampusEvent</span>
+        </div>
+
+        <nav>
+            <a href="dashboard.html">
+                <span>🏠</span> <span>Dashboard</span>
+            </a>
+            <a href="events.html">
+                <span>📅</span> <span>Events</span>
+            </a>
+            <a href="my-events.html">
+                <span>📝</span> <span>My Events</span>
+            </a>
+            <a href="notifications.html">
+                <span>🔔</span> <span>Notifications</span>
+            </a>
+            <a href="feedback.html" class="active">
+                <span>⭐</span> <span>Feedback</span>
+            </a>
+            <a href="profile.html">
+                <span>👤</span> <span>Profile</span>
+            </a>
+        </nav>
+
+        <div class="sidebar-footer">
+            <a href="#" onclick="logout()" class="sidebar-logout">
+                <span>🚪</span> <span>Logout</span>
+            </a>
+        </div>
+    </aside>
+
+    <!-- MAIN CONTENT -->
+    <main class="main-content">
+        <header class="topbar">
+            <div class="topbar-left">
+                <h2>Event Feedback & Reviews</h2>
+                <p>Help organizers improve upcoming activities with your honest insights</p>
+            </div>
+
+            <div class="topbar-right">
+                <button class="theme-toggle" id="themeToggle" aria-label="Toggle Theme">
+                    <span class="theme-icon">🌙</span> <span class="theme-label">Dark Mode</span>
+                </button>
+
+                <div class="student-info">
+                    <div class="student-avatar">S</div>
+                    <span>Student</span>
+                </div>
+            </div>
+        </header>
+
+        <div style="display: grid; grid-template-columns: 1.2fr 1fr; gap: 28px;">
+            <section class="dashboard-section" style="margin-bottom: 0;">
+                <div class="section-heading">
+                    <h2><span>📝</span> Share Your Experience</h2>
+                </div>
+
+                <form id="feedbackForm">
+                    <div style="margin-bottom: 18px;">
+                        <label for="event">Select Campus Event</label>
+                        <select id="event" required>
+                            <!-- Dynamically populated via js/feedback.js -->
+                        </select>
+                    </div>
+
+                    <div style="margin-bottom: 18px;">
+                        <label for="rating">Overall Experience Rating</label>
+                        <select id="rating" required>
+                            <option value="5">⭐⭐⭐⭐⭐ 5 Stars - Outstanding & Insightful</option>
+                            <option value="4" selected>⭐⭐⭐⭐ 4 Stars - Very Good & Organized</option>
+                            <option value="3">⭐⭐⭐ 3 Stars - Average / Met Expectations</option>
+                            <option value="2">⭐⭐ 2 Stars - Below Average / Needs Improvement</option>
+                            <option value="1">⭐ 1 Star - Poor Experience</option>
+                        </select>
+                    </div>
+
+                    <div style="margin-bottom: 22px;">
+                        <label for="comments">Your Comments & Suggestions</label>
+                        <textarea
+                            id="comments"
+                            rows="4"
+                            placeholder="What did you enjoy most? How can the speaker or workshop format be improved?"
+                            required
+                        ></textarea>
+                    </div>
+
+                    <button type="submit" class="btn-primary" style="width: auto; padding: 12px 28px;">
+                        <span>🚀</span> Submit Feedback
+                    </button>
+                </form>
+
+                <p id="feedbackMessage" style="margin-top: 15px; font-weight: 700; font-size: 14px; min-height: 24px;"></p>
+            </section>
+
+            <section class="dashboard-section" style="margin-bottom: 0;">
+                <div class="section-heading">
+                    <h2><span>💬</span> Your Submitted Reviews</h2>
+                    <span id="feedbackCount" style="font-size: 12px; font-weight: 700; color: var(--text-secondary);"></span>
+                </div>
+
+                <div id="feedbackList" style="display: flex; flex-direction: column; gap: 14px;">
+                    <!-- Populated dynamically via js/feedback.js -->
+                </div>
+            </section>
+        </div>
+    </main>
+
+</div>
+
+<script src="../js/feedback.js"></script>
+
+</body>
+</html>

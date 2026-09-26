@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Notifications • Admin Portal</title>
+    <link rel="stylesheet" href="../css/admin.css">
+    <script src="../js/theme.js"></script>
+</head>
+<body>
+
+<div class="admin-layout">
+    <!-- SIDEBAR -->
+    <aside class="sidebar">
+        <div class="sidebar-header">
+            <div class="brand-icon">🛡️</div>
+            <div class="brand-text">
+                <h2>CampusEvent</h2>
+                <span class="role-badge">Super Admin</span>
+            </div>
+        </div>
+
+        <nav>
+            <a href="dashboard.html">
+                <span class="nav-icon">📊</span>
+                <span>Dashboard</span>
+            </a>
+            <a href="students.html">
+                <span class="nav-icon">🎓</span>
+                <span>Students</span>
+            </a>
+            <a href="faculty.html">
+                <span class="nav-icon">👨‍🏫</span>
+                <span>Faculty</span>
+            </a>
+            <a href="organizers.html">
+                <span class="nav-icon">🧑‍💼</span>
+                <span>Organizers</span>
+            </a>
+            <a href="events.html">
+                <span class="nav-icon">📅</span>
+                <span>Events</span>
+            </a>
+            <a href="reports.html">
+                <span class="nav-icon">📈</span>
+                <span>Reports</span>
+            </a>
+            <a href="notifications.html" class="active">
+                <span class="nav-icon">🔔</span>
+                <span>Notifications</span>
+            </a>
+            <a href="profile.html">
+                <span class="nav-icon">👤</span>
+                <span>Profile</span>
+            </a>
+        </nav>
+
+        <button onclick="logout()" class="logout-btn">
+            <span>🚪</span>
+            <span>Sign Out</span>
+        </button>
+    </aside>
+
+    <!-- MAIN CONTENT -->
+    <main class="main-content">
+        <header class="topbar">
+            <div class="topbar-title">
+                <h1>System Notifications</h1>
+                <p>Real-time campus event alerts, venue conflict warnings, and security updates</p>
+            </div>
+
+            <div class="topbar-actions">
+                <button class="theme-toggle" id="themeToggle" aria-label="Toggle Theme">
+                    <span class="theme-icon">🌙</span>
+                    <span class="theme-label">Dark Mode</span>
+                </button>
+                <div class="admin-user-pill">
+                    <div class="admin-avatar">🛡️</div>
+                    <div class="admin-info">
+                        <span class="admin-name">System Admin</span>
+                        <span class="admin-role">Super Administrator</span>
+                    </div>
+                </div>
+            </div>
+        </header>
+
+        <section class="content-section">
+            <div class="notifications-list" id="adminNotificationsList">
+                <div style="text-align: center; padding: 30px; color: var(--text-muted);">
+                    Loading live alerts from campus database...
+                </div>
+            </div>
+        </section>
+    </main>
+</div>
+
+<script src="../js/session.js"></script>
+<script src="../js/admin.js"></script>
+</body>
+</html>

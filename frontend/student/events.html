@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Events Directory • Campus Event Portal</title>
+    <link rel="stylesheet" href="../css/student.css">
+    <script src="../js/theme.js"></script>
+    <script src="../js/session.js"></script>
+    <script src="../js/events-data.js"></script>
+</head>
+
+<body>
+
+<div class="layout">
+
+    <!-- SIDEBAR -->
+    <aside class="sidebar">
+        <div class="sidebar-logo">
+            <span>🎪</span> <span>CampusEvent</span>
+        </div>
+
+        <nav>
+            <a href="dashboard.html">
+                <span>🏠</span> <span>Dashboard</span>
+            </a>
+            <a href="events.html" class="active">
+                <span>📅</span> <span>Events</span>
+            </a>
+            <a href="my-events.html">
+                <span>📝</span> <span>My Events</span>
+            </a>
+            <a href="notifications.html">
+                <span>🔔</span> <span>Notifications</span>
+            </a>
+            <a href="feedback.html">
+                <span>⭐</span> <span>Feedback</span>
+            </a>
+            <a href="profile.html">
+                <span>👤</span> <span>Profile</span>
+            </a>
+        </nav>
+
+        <div class="sidebar-footer">
+            <a href="#" onclick="logout()" class="sidebar-logout">
+                <span>🚪</span> <span>Logout</span>
+            </a>
+        </div>
+    </aside>
+
+    <!-- MAIN CONTENT -->
+    <main class="main-content">
+        <header class="topbar">
+            <div class="topbar-left">
+                <h2>Campus Events Directory</h2>
+                <p>Discover, search, and register for college events and workshops</p>
+            </div>
+
+            <div class="topbar-right">
+                <button class="theme-toggle" id="themeToggle" aria-label="Toggle Theme">
+                    <span class="theme-icon">🌙</span> <span class="theme-label">Dark Mode</span>
+                </button>
+
+                <div class="student-info">
+                    <div class="student-avatar">S</div>
+                    <span>Student</span>
+                </div>
+            </div>
+        </header>
+
+        <section class="dashboard-section">
+            <div class="search-filter-container">
+                <div class="search-input-wrapper">
+                    <span class="search-icon-inside">🔍</span>
+                    <input
+                        type="text"
+                        id="searchBox"
+                        class="search-input"
+                        placeholder="Search events by title, keyword, or speaker..."
+                        onkeyup="searchEvents()"
+                    >
+                </div>
+
+                <div class="category-filter-chips">
+                    <button class="filter-chip active" onclick="filterCategory('All', this)">All</button>
+                    <button class="filter-chip" onclick="filterCategory('Technical', this)">Technical</button>
+                    <button class="filter-chip" onclick="filterCategory('Workshop', this)">Workshops</button>
+                    <button class="filter-chip" onclick="filterCategory('Seminar', this)">Seminars</button>
+                    <button class="filter-chip" onclick="filterCategory('Cyber Security', this)">Cyber Security</button>
+                </div>
+            </div>
+
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+                <p id="eventsCount" style="font-size: 13px; font-weight: 700; color: var(--text-secondary);">
+                    Loading events...
+                </p>
+            </div>
+
+            <div id="eventList" class="event-grid">
+                <!-- Rendered dynamically via js/events.js -->
+            </div>
+        </section>
+    </main>
+
+</div>
+
+<script src="../js/events.js"></script>
+
+</body>
+</html>

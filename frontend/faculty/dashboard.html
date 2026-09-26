@@ -1,0 +1,238 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Faculty Dashboard • Campus Event Portal</title>
+    <link rel="stylesheet" href="../css/faculty.css">
+    <script src="../js/theme.js"></script>
+    <script src="../js/session.js"></script>
+    <script src="../js/faculty.js"></script>
+</head>
+
+<body>
+
+<div class="layout">
+
+    <!-- SIDEBAR -->
+    <aside class="sidebar">
+        <div class="sidebar-logo">
+            <span>🎪</span> <span>CampusEvent</span>
+        </div>
+
+        <nav>
+            <a href="dashboard.html" class="active">
+                <span>🏠</span> <span>Dashboard</span>
+            </a>
+            <a href="event-requests.html">
+                <span>📋</span> <span>Event Requests</span>
+            </a>
+            <a href="approved-events.html">
+                <span>✅</span> <span>Approved Events</span>
+            </a>
+            <a href="reports.html">
+                <span>📊</span> <span>Reports</span>
+            </a>
+            <a href="notifications.html">
+                <span>🔔</span> <span>Notifications</span>
+            </a>
+            <a href="profile.html">
+                <span>👤</span> <span>Profile</span>
+            </a>
+        </nav>
+
+        <div class="sidebar-footer">
+            <a href="#" onclick="logout()" class="sidebar-logout">
+                <span>🚪</span> <span>Logout</span>
+            </a>
+        </div>
+    </aside>
+
+    <!-- MAIN CONTENT -->
+    <main class="main-content">
+        <header class="topbar">
+            <div class="topbar-left">
+                <h2>Faculty Coordinator Dashboard</h2>
+                <p>Welcome back 👋 Review pending proposals and approvals</p>
+            </div>
+
+            <div class="topbar-right">
+                <button class="theme-toggle" id="themeToggle" aria-label="Toggle Theme">
+                    <span class="theme-icon">🌙</span> <span class="theme-label">Dark Mode</span>
+                </button>
+
+                <div class="faculty-info">
+                    <div class="faculty-avatar">R</div>
+                    <span>Faculty Coordinator</span>
+                </div>
+            </div>
+        </header>
+
+        <!-- STATISTICS -->
+        <section class="stats">
+            <div class="stat-card">
+                <div class="stat-info">
+                    <h3 id="statPending">0</h3>
+                    <p>Pending Proposals</p>
+                </div>
+                <div class="stat-icon">⏳</div>
+            </div>
+
+            <div class="stat-card">
+                <div class="stat-info">
+                    <h3 id="statApproved">0</h3>
+                    <p>Approved Events</p>
+                </div>
+                <div class="stat-icon">✅</div>
+            </div>
+
+            <div class="stat-card">
+                <div class="stat-info">
+                    <h3>0</h3>
+                    <p>Completed Events</p>
+                </div>
+                <div class="stat-icon">🎓</div>
+            </div>
+
+            <div class="stat-card">
+                <div class="stat-info">
+                    <h3>0</h3>
+                    <p>Post-Event Reports</p>
+                </div>
+                <div class="stat-icon">📊</div>
+            </div>
+        </section>
+
+        <!-- EVENT REQUESTS TABLE -->
+        <section class="dashboard-section">
+            <div class="section-heading">
+                <h2><span>📋</span> Recent Event Proposals For Review</h2>
+                <a href="event-requests.html">View All Requests →</a>
+            </div>
+
+            <div class="table-wrapper">
+                <table class="request-table">
+                    <thead>
+                        <tr>
+                            <th>Event Name</th>
+                            <th>Student Organizer</th>
+                            <th>Date</th>
+                            <th>Participants</th>
+                            <th>Status</th>
+                            <th>Action</th>
+                        </tr>
+                    </thead>
+                    <tbody id="dashboardRequestsBody">
+                        <!-- Populated dynamically via JS -->
+                    </tbody>
+                </table>
+            </div>
+        </section>
+
+        <!-- UPCOMING APPROVED EVENTS -->
+        <section class="dashboard-section">
+            <div class="section-heading">
+                <h2><span>🌟</span> Upcoming Approved Campus Events</h2>
+                <a href="approved-events.html">View All Approved →</a>
+            </div>
+
+            <div id="dashboardApprovedGrid" class="event-grid">
+                <!-- Populated dynamically via JS -->
+            </div>
+        </section>
+    </main>
+
+</div>
+
+<script>
+document.addEventListener("DOMContentLoaded", async function () {
+    await loadFacultyRequestsFromDB();
+    const requests = getFacultyRequests();
+    const pendingList = requests.filter(r => r.status === "Pending");
+
+    // Fetch approved events directly from database
+    let approvedList = [];
+    try {
+        const res = await fetch("http://localhost:5000/api/events");
+        const data = await res.json();
+        if (data.success && Array.isArray(data.data)) {
+            approvedList = data.data;
+        }
+    } catch(e) {}
+
+    // Update Stats
+    const statPending = document.getElementById("statPending");
+    const statApproved = document.getElementById("statApproved");
+    if (statPending) statPending.textContent = pendingList.length;
+    if (statApproved) statApproved.textContent = approvedList.length;
+
+    // Render Recent Requests Table
+    const tbody = document.getElementById("dashboardRequestsBody");
+    if (tbody) {
+        tbody.innerHTML = "";
+        if (requests.length === 0) {
+            tbody.innerHTML = `
+                <tr>
+                    <td colspan="6" style="text-align: center; padding: 25px; color: var(--text-muted);">
+                        No event proposals waiting for faculty review in database.
+                    </td>
+                </tr>
+            `;
+        } else {
+            requests.slice(0, 3).forEach(req => {
+                let statusClass = (req.status || "Pending").toLowerCase();
+
+                tbody.innerHTML += `
+                    <tr>
+                        <td><strong>${req.name}</strong></td>
+                        <td>${req.organizer}</td>
+                        <td>📅 ${req.date}</td>
+                        <td>👥 ${req.participants}</td>
+                        <td><span class="status ${statusClass}">${req.status}</span></td>
+                        <td>
+                            <button onclick="viewRequest(${req.id})">
+                                Review Proposal →
+                            </button>
+                        </td>
+                    </tr>
+                `;
+            });
+        }
+    }
+
+    // Render Approved Events Grid
+    const approvedGrid = document.getElementById("dashboardApprovedGrid");
+    if (approvedGrid) {
+        approvedGrid.innerHTML = "";
+        if (approvedList.length === 0) {
+            approvedGrid.innerHTML = `
+                <div style="grid-column: 1 / -1; text-align: center; padding: 30px; color: var(--text-muted);">
+                    <p>No approved campus events currently recorded in database.</p>
+                </div>
+            `;
+        } else {
+            approvedList.forEach(event => {
+                approvedGrid.innerHTML += `
+                    <div class="event-card">
+                        <div>
+                            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
+                                <span class="status approved">✓ Approved</span>
+                                <span style="font-size: 12px; color: var(--text-muted); font-weight: 700;">${event.category || "General"}</span>
+                            </div>
+                            <h3>${event.name}</h3>
+                            <p>📅 <strong>${event.date}</strong></p>
+                            <p>⏰ ${event.time}</p>
+                            <p>📍 ${event.venue}</p>
+                            <p>👥 Expected: ${event.totalSeats || event.capacity} attendees</p>
+                            ${event.organizer ? `<p style="margin-top: 6px; font-size: 13px;">Organized by: <strong>${event.organizer}</strong></p>` : ''}
+                        </div>
+                    </div>
+                `;
+            });
+        }
+    }
+});
+</script>
+
+</body>
+</html>

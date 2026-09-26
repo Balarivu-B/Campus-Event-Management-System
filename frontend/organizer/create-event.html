@@ -1,0 +1,264 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Create Event Proposal • Organizer Portal</title>
+    <link rel="stylesheet" href="../css/organizer.css">
+    <script src="../js/theme.js"></script>
+    <script src="../js/organizer.js"></script>
+</head>
+
+<body>
+
+<div class="layout">
+
+    <!-- SIDEBAR -->
+    <aside class="sidebar">
+        <div class="sidebar-logo">
+            <span>🎪</span> <span>CampusEvent</span>
+        </div>
+
+        <nav>
+            <a href="dashboard.html">
+                <span>🏠</span> <span>Dashboard</span>
+            </a>
+            <a href="create-event.html" class="active" id="navCreateLink">
+                <span>➕</span> <span id="navCreateText">Create Event</span>
+            </a>
+            <a href="my-events.html">
+                <span>📅</span> <span>My Events</span>
+            </a>
+            <a href="registrations.html">
+                <span>👥</span> <span>Registrations</span>
+            </a>
+            <a href="notifications.html">
+                <span>🔔</span> <span>Notifications</span>
+            </a>
+            <a href="profile.html">
+                <span>👤</span> <span>Profile</span>
+            </a>
+        </nav>
+
+        <div class="sidebar-footer">
+            <a href="#" onclick="logout()" class="sidebar-logout">
+                <span>🚪</span> <span>Logout</span>
+            </a>
+        </div>
+    </aside>
+
+    <!-- MAIN CONTENT -->
+    <main class="main-content">
+        <header class="topbar">
+            <div class="topbar-left">
+                <h2 id="pageTitle">Create New Event Proposal</h2>
+                <p id="pageSubtitle">Submit club event proposals for faculty coordinator review and venue clearance</p>
+            </div>
+
+            <div class="topbar-right">
+                <button class="theme-toggle" id="themeToggle" aria-label="Toggle Theme">
+                    <span class="theme-icon">🌙</span> <span class="theme-label">Dark Mode</span>
+                </button>
+
+                <div class="organizer-info">
+                    <div class="organizer-avatar">A</div>
+                    <span>Event Organizer</span>
+                </div>
+            </div>
+        </header>
+
+        <section class="dashboard-section">
+            <div class="section-heading">
+                <h2 id="formHeading"><span>📝</span> Event Information & Logistics</h2>
+                <a href="my-events.html" class="btn-secondary">
+                    ← Back to My Events
+                </a>
+            </div>
+
+            <form id="eventForm" class="event-form">
+                <div style="display: grid; grid-template-columns: 2fr 1fr; gap: 16px;">
+                    <div>
+                        <label for="eventName">Event Title *</label>
+                        <input
+                            type="text"
+                            id="eventName"
+                            placeholder="e.g. National Hackathon 2026"
+                            required
+                        >
+                    </div>
+
+                    <div>
+                        <label for="category">Category *</label>
+                        <select id="category" required>
+                            <option value="Technical">Technical</option>
+                            <option value="Workshop">Workshop</option>
+                            <option value="Seminar">Seminar</option>
+                            <option value="Cultural">Cultural</option>
+                            <option value="Sports">Sports</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px;">
+                    <div>
+                        <label for="eventDate">Event Date *</label>
+                        <input
+                            type="date"
+                            id="eventDate"
+                            required
+                        >
+                    </div>
+
+                    <div>
+                        <label for="eventTime">Start Time *</label>
+                        <input
+                            type="time"
+                            id="eventTime"
+                            required
+                        >
+                    </div>
+
+                    <div>
+                        <label for="capacity">Expected Capacity (Seats) *</label>
+                        <input
+                            type="number"
+                            id="capacity"
+                            min="10"
+                            placeholder="e.g. 100"
+                            required
+                        >
+                    </div>
+                </div>
+
+                <div>
+                    <label for="venue">Preferred Campus Venue *</label>
+                    <select id="venue" required>
+                        <option value="Seminar Hall">Seminar Hall (Block A)</option>
+                        <option value="College Auditorium">College Main Auditorium</option>
+                        <option value="Computer Lab">Computer Lab 2</option>
+                        <option value="Lab 3">Security & Networks Lab 3</option>
+                        <option value="Innovation Center">Innovation Center Hub</option>
+                        <option value="Open Air Theatre">Open Air Amphitheatre</option>
+                        <option value="Sports Ground">College Sports Arena</option>
+                    </select>
+                </div>
+
+                <div>
+                    <label for="description">Detailed Description & Agenda *</label>
+                    <textarea
+                        id="description"
+                        rows="5"
+                        placeholder="Detail the event objectives, speaker requirements, software prerequisites, and expected outcomes..."
+                        required
+                    ></textarea>
+                </div>
+
+                <div style="display: flex; gap: 12px; align-items: center; margin-top: 10px;">
+                    <button type="submit" class="primary-btn" id="submitBtn">
+                        <span>🚀</span> Submit Proposal for Review
+                    </button>
+                    <button type="button" class="btn-secondary" id="cancelEditBtn" style="display: none;" onclick="cancelEditMode()">
+                        Cancel Edit
+                    </button>
+                </div>
+            </form>
+
+            <p id="eventMessage" style="margin-top: 20px; font-weight: 700; font-size: 14px; min-height: 24px;"></p>
+        </section>
+    </main>
+
+</div>
+
+<script src="../js/session.js"></script>
+<script>
+let currentEditingId = null;
+
+document.addEventListener("DOMContentLoaded", async function () {
+    const form = document.getElementById("eventForm");
+    const editId = localStorage.getItem("editEvent");
+
+    // Check if in Edit mode
+    if (editId) {
+        currentEditingId = Number(editId);
+        await loadOrganizerEventsFromDB();
+        const existing = getOrganizerEventById(currentEditingId);
+        if (existing) {
+            document.getElementById("pageTitle").textContent = "Edit Event Details";
+            document.getElementById("pageSubtitle").textContent = "Update event timing, capacity, or venue specifications";
+            document.getElementById("formHeading").innerHTML = "<span>✏️</span> Editing Event: " + existing.name;
+            document.getElementById("submitBtn").innerHTML = "<span>💾</span> Update Event Details";
+            document.getElementById("cancelEditBtn").style.display = "inline-flex";
+
+            document.getElementById("eventName").value = existing.name || "";
+            document.getElementById("category").value = existing.category || "Technical";
+            document.getElementById("eventDate").value = existing.date || "";
+            document.getElementById("eventTime").value = existing.time ? existing.time.split(" ")[0] : "10:00";
+            document.getElementById("venue").value = existing.venue || "Seminar Hall";
+            document.getElementById("capacity").value = existing.capacity || 100;
+            document.getElementById("description").value = existing.description || "";
+        }
+    }
+
+    form.addEventListener("submit", async function (e) {
+        e.preventDefault();
+
+        const name = document.getElementById("eventName").value.trim();
+        const category = document.getElementById("category").value;
+        const date = document.getElementById("eventDate").value;
+        const timeVal = document.getElementById("eventTime").value;
+        const venue = document.getElementById("venue").value;
+        const capacity = Number(document.getElementById("capacity").value);
+        const description = document.getElementById("description").value.trim();
+
+        const submitBtn = document.getElementById("submitBtn");
+        submitBtn.disabled = true;
+        submitBtn.innerHTML = "<span>Saving...</span>";
+
+        const eventData = {
+            id: currentEditingId,
+            isEdit: Boolean(currentEditingId),
+            name: name,
+            category: category,
+            date: date,
+            time: timeVal ? timeVal + ":00" : "10:00:00",
+            venue: venue,
+            capacity: capacity,
+            description: description
+        };
+
+        const success = await saveOrganizerEvent(eventData);
+        submitBtn.disabled = false;
+        submitBtn.innerHTML = currentEditingId ? "<span>💾</span> Update Event Details" : "<span>🚀</span> Submit Proposal for Review";
+
+        const msg = document.getElementById("eventMessage");
+        if (success) {
+            if (currentEditingId) {
+                msg.textContent = "✅ Event details updated successfully in database!";
+                msg.style.color = "#16a34a";
+                localStorage.removeItem("editEvent");
+                setTimeout(() => {
+                    window.location.href = "my-events.html";
+                }, 800);
+            } else {
+                msg.textContent = "✅ Event proposal submitted to database! Faculty will review for approval.";
+                msg.style.color = "#16a34a";
+                form.reset();
+                setTimeout(() => {
+                    msg.textContent = "";
+                }, 4000);
+            }
+        } else {
+            msg.textContent = "✕ Failed to save event. Ensure backend is active.";
+            msg.style.color = "#dc2626";
+        }
+    });
+});
+
+function cancelEditMode() {
+    localStorage.removeItem("editEvent");
+    window.location.href = "my-events.html";
+}
+</script>
+
+</body>
+</html>

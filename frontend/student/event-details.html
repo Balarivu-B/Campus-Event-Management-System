@@ -1,0 +1,232 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Event Details • Campus Event Portal</title>
+    <link rel="stylesheet" href="../css/student.css">
+    <script src="../js/theme.js"></script>
+    <script src="../js/session.js"></script>
+    <script src="../js/events-data.js"></script>
+</head>
+
+<body>
+
+<div class="layout">
+
+    <!-- SIDEBAR -->
+    <aside class="sidebar">
+        <div class="sidebar-logo">
+            <span>🎪</span> <span>CampusEvent</span>
+        </div>
+
+        <nav>
+            <a href="dashboard.html">
+                <span>🏠</span> <span>Dashboard</span>
+            </a>
+            <a href="events.html" class="active">
+                <span>📅</span> <span>Events</span>
+            </a>
+            <a href="my-events.html">
+                <span>📝</span> <span>My Events</span>
+            </a>
+            <a href="notifications.html">
+                <span>🔔</span> <span>Notifications</span>
+            </a>
+            <a href="feedback.html">
+                <span>⭐</span> <span>Feedback</span>
+            </a>
+            <a href="profile.html">
+                <span>👤</span> <span>Profile</span>
+            </a>
+        </nav>
+
+        <div class="sidebar-footer">
+            <a href="#" onclick="logout()" class="sidebar-logout">
+                <span>🚪</span> <span>Logout</span>
+            </a>
+        </div>
+    </aside>
+
+    <!-- MAIN CONTENT -->
+    <main class="main-content">
+        <header class="topbar">
+            <div class="topbar-left">
+                <h2>Event Details</h2>
+                <p>Comprehensive event information and seat reservation</p>
+            </div>
+
+            <div class="topbar-right">
+                <button class="theme-toggle" id="themeToggle" aria-label="Toggle Theme">
+                    <span class="theme-icon">🌙</span> <span class="theme-label">Dark Mode</span>
+                </button>
+                <div class="student-info">
+                    <div class="student-avatar">A</div>
+                    <span>Student</span>
+                </div>
+            </div>
+        </header>
+
+        <div style="margin-bottom: 20px;">
+            <a href="events.html" class="btn-secondary" style="display: inline-flex; width: auto; padding: 8px 16px;">
+                ← Back to All Events
+            </a>
+        </div>
+
+        <div id="eventContainer">
+            <!-- Populated dynamically via JS -->
+        </div>
+
+    </main>
+</div>
+
+<script>
+document.addEventListener("DOMContentLoaded", async function () {
+    await loadLiveCampusEvents();
+    const selectedId = localStorage.getItem("selectedEvent") || 1;
+    const event = getEventById(selectedId);
+    const container = document.getElementById("eventContainer");
+
+    if (!event) {
+        container.innerHTML = `
+            <div class="dashboard-section" style="text-align: center; padding: 40px;">
+                <h3>Event Not Found</h3>
+                <p style="color: var(--text-muted); margin-top: 8px;">The requested event record could not be loaded from database.</p>
+                <a href="events.html" class="btn-secondary" style="margin-top: 15px; display: inline-flex;">Back to Events</a>
+            </div>
+        `;
+        return;
+    }
+
+    function renderEvent() {
+        const isRegistered = isEventRegistered(event.id);
+        const registeredList = getRegisteredEventIds();
+        const seatsLeft = isRegistered ? event.seats - 1 : event.seats;
+        const totalSeats = event.totalSeats || 60;
+        const percentFilled = Math.min(100, Math.round(((totalSeats - seatsLeft) / totalSeats) * 100));
+
+        let categoryClass = "cat-technical";
+        if (event.category === "Workshop") categoryClass = "cat-workshop";
+        if (event.category === "Seminar") categoryClass = "cat-seminar";
+        if (event.category.includes("Security")) categoryClass = "cat-cyber-security";
+
+        container.innerHTML = `
+            <div class="event-details-hero">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; flex-wrap: wrap; gap: 10px;">
+                    <span class="event-category ${categoryClass}">${event.category}</span>
+                    ${isRegistered ? '<span class="registered-chip">✓ You are Registered</span>' : '<span style="font-size: 13px; color: var(--text-muted);">Registration Open</span>'}
+                </div>
+
+                <h1 style="font-size: 32px; font-weight: 800; margin-bottom: 16px; color: var(--text-primary); letter-spacing: -0.5px;">
+                    ${event.name}
+                </h1>
+
+                <div style="display: flex; gap: 24px; flex-wrap: wrap; color: var(--text-secondary); font-size: 14px;">
+                    <span>📅 <strong>${event.date}</strong></span>
+                    <span>⏰ <strong>${event.time}</strong></span>
+                    <span>📍 <strong>${event.venue}</strong></span>
+                    <span>⏳ Deadline: <strong>${event.deadline || "Day before event"}</strong></span>
+                </div>
+            </div>
+
+            <div class="event-details-grid">
+                <div>
+                    <div class="dashboard-section" style="margin-bottom: 24px;">
+                        <h3 style="font-size: 18px; margin-bottom: 12px; color: var(--text-primary);">📖 Event Description</h3>
+                        <p style="color: var(--text-secondary); font-size: 15px; line-height: 1.7; margin-bottom: 20px;">
+                            ${event.description}
+                        </p>
+
+                        <h3 style="font-size: 18px; margin-bottom: 12px; color: var(--text-primary);">🎯 Key Highlights & Agenda</h3>
+                        <ul style="color: var(--text-secondary); padding-left: 20px; line-height: 1.8; font-size: 14px; margin-bottom: 20px;">
+                            <li>Comprehensive conceptual overview and industrial context</li>
+                            <li>Interactive live demonstrations & practical problem walkthroughs</li>
+                            <li>Q&A session with industry practitioners and certificates for participants</li>
+                            <li>Networking opportunity with peer tech enthusiasts and club leads</li>
+                        </ul>
+                    </div>
+
+                    <div class="dashboard-section">
+                        <h3 style="font-size: 18px; margin-bottom: 16px; color: var(--text-primary);">👥 Speakers & Coordinators</h3>
+                        
+                        <div class="detail-block">
+                            <label>Featured Speaker / Instructor</label>
+                            <value>${event.speaker}</value>
+                        </div>
+
+                        <div class="detail-block" style="margin-bottom: 0;">
+                            <label>Faculty Coordinator</label>
+                            <value>${event.coordinator}</value>
+                        </div>
+                    </div>
+                </div>
+
+                <div>
+                    <div class="registration-card">
+                        <div style="font-size: 40px; margin-bottom: 10px;">${isRegistered ? "🎉" : "🎟️"}</div>
+                        <h3 style="font-size: 20px; font-weight: 800; margin-bottom: 8px;">
+                            ${isRegistered ? "Registration Confirmed" : "Reserve Your Seat"}
+                        </h3>
+                        <p style="color: var(--text-secondary); font-size: 13px; margin-bottom: 20px;">
+                            ${isRegistered ? "Your seat is confirmed! Present your student ID at the venue desk." : "Registration is free for all current university students."}
+                        </p>
+
+                        <div style="margin-bottom: 20px; text-align: left;">
+                            <div style="display: flex; justify-content: space-between; font-size: 13px; font-weight: 700; margin-bottom: 6px;">
+                                <span>Seat Capacity</span>
+                                <span>${seatsLeft} seats left</span>
+                            </div>
+                            <div style="width: 100%; height: 8px; background: var(--bg-card-subtle); border-radius: 999px; overflow: hidden;">
+                                <div style="width: ${percentFilled}%; height: 100%; background: var(--primary); border-radius: 999px;"></div>
+                            </div>
+                        </div>
+
+                        ${isRegistered ? `
+                            <button id="actionBtn" class="btn-danger" style="width: 100%; padding: 12px; margin-bottom: 12px;">
+                                Cancel Registration
+                            </button>
+                            <a href="my-events.html" class="btn-secondary" style="width: 100%; padding: 12px;">
+                                View in My Events →
+                            </a>
+                        ` : `
+                            <button id="actionBtn" class="btn-primary" style="width: 100%; padding: 14px; margin-bottom: 12px; font-size: 15px;">
+                                ⚡ Register for This Event
+                            </button>
+                            <a href="events.html" class="btn-secondary" style="width: 100%; padding: 12px;">
+                                Browse Other Events
+                            </a>
+                        `}
+
+                        <div id="toastMessage" style="margin-top: 15px; font-size: 13px; font-weight: 600; min-height: 20px;"></div>
+                    </div>
+                </div>
+            </div>
+        `;
+
+        const actionBtn = document.getElementById("actionBtn");
+        const toast = document.getElementById("toastMessage");
+
+        if (actionBtn) {
+            actionBtn.addEventListener("click", function () {
+                if (isRegistered) {
+                    cancelEventRegistration(event.id);
+                    toast.textContent = "Registration cancelled successfully.";
+                    toast.style.color = "#ef4444";
+                } else {
+                    registerForEvent(event.id);
+                    toast.textContent = "✓ Registered successfully! Seat confirmed.";
+                    toast.style.color = "#16a34a";
+                }
+                setTimeout(() => {
+                    renderEvent();
+                }, 400);
+            });
+        }
+    }
+
+    renderEvent();
+});
+</script>
+
+</body>
+</html>

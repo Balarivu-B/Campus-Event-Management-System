@@ -1,0 +1,220 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Event Registrations • Organizer Portal</title>
+    <link rel="stylesheet" href="../css/organizer.css">
+    <script src="../js/theme.js"></script>
+    <script src="../js/organizer.js"></script>
+</head>
+
+<body>
+
+<div class="layout">
+
+    <!-- SIDEBAR -->
+    <aside class="sidebar">
+        <div class="sidebar-logo">
+            <span>🎪</span> <span>CampusEvent</span>
+        </div>
+
+        <nav>
+            <a href="dashboard.html">
+                <span>🏠</span> <span>Dashboard</span>
+            </a>
+            <a href="create-event.html">
+                <span>➕</span> <span>Create Event</span>
+            </a>
+            <a href="my-events.html">
+                <span>📅</span> <span>My Events</span>
+            </a>
+            <a href="registrations.html" class="active">
+                <span>👥</span> <span>Registrations</span>
+            </a>
+            <a href="notifications.html">
+                <span>🔔</span> <span>Notifications</span>
+            </a>
+            <a href="profile.html">
+                <span>👤</span> <span>Profile</span>
+            </a>
+        </nav>
+
+        <div class="sidebar-footer">
+            <a href="#" onclick="logout()" class="sidebar-logout">
+                <span>🚪</span> <span>Logout</span>
+            </a>
+        </div>
+    </aside>
+
+    <!-- MAIN CONTENT -->
+    <main class="main-content">
+        <header class="topbar">
+            <div class="topbar-left">
+                <h2>Student Registrations & Attendee Roster</h2>
+                <p>Monitor real-time student seat bookings, department distributions, and check-in status</p>
+            </div>
+
+            <div class="topbar-right">
+                <button class="theme-toggle" id="themeToggle" aria-label="Toggle Theme">
+                    <span class="theme-icon">🌙</span> <span class="theme-label">Dark Mode</span>
+                </button>
+
+                <div class="organizer-info">
+                    <div class="organizer-avatar">A</div>
+                    <span>Event Organizer</span>
+                </div>
+            </div>
+        </header>
+
+        <section class="dashboard-section">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 22px; flex-wrap: wrap; gap: 14px;">
+                <div style="display: flex; gap: 12px; align-items: center; flex-wrap: wrap;">
+                    <label for="eventSelect" style="font-weight: 700; font-size: 14px; margin-bottom: 0;">Select Event:</label>
+                    <select id="eventSelect" style="padding: 10px 14px; border: 1px solid var(--border-color); border-radius: 10px; background: var(--input-bg); color: var(--text-primary); font-family: inherit; margin-bottom: 0;" onchange="loadRegistrations()">
+                        <!-- Populated dynamically via JS -->
+                    </select>
+                </div>
+
+                <div style="display: flex; gap: 10px; align-items: center;">
+                    <input
+                        type="text"
+                        id="searchRosterInput"
+                        placeholder="Filter by name, ID or email..."
+                        style="padding: 10px 14px; border: 1px solid var(--border-color); border-radius: 10px; background: var(--input-bg); color: var(--text-primary); font-family: inherit; margin-bottom: 0; min-width: 240px;"
+                        onkeyup="filterRoster()"
+                    >
+                    <span id="rosterCountBadge" style="font-size: 13px; font-weight: 700; color: var(--text-secondary); white-space: nowrap;"></span>
+                </div>
+            </div>
+
+            <div class="table-wrapper">
+                <table class="data-table">
+                    <thead>
+                        <tr>
+                            <th>Student ID</th>
+                            <th>Student Name</th>
+                            <th>Department</th>
+                            <th>Email Address</th>
+                            <th>Registration Date</th>
+                            <th>Check-in Status</th>
+                        </tr>
+                    </thead>
+                    <tbody id="rosterTableBody">
+                        <!-- Populated dynamically via JS -->
+                    </tbody>
+                </table>
+            </div>
+        </section>
+    </main>
+
+</div>
+
+<script src="../js/session.js"></script>
+<script>
+let currentRosterList = [];
+
+async function initEventSelector() {
+    await loadOrganizerEventsFromDB();
+    const events = getOrganizerEvents();
+    const selector = document.getElementById("eventSelect");
+    if (!selector) return;
+
+    selector.innerHTML = "";
+    if (events.length === 0) {
+        selector.innerHTML = `<option value="">No events found</option>`;
+        loadRegistrations();
+        return;
+    }
+
+    events.forEach(e => {
+        const opt = document.createElement("option");
+        opt.value = e.id;
+        opt.textContent = `${e.name} (${e.category || "General"})`;
+        selector.appendChild(opt);
+    });
+
+    await loadRegistrations();
+}
+
+async function loadRegistrations() {
+    const selector = document.getElementById("eventSelect");
+    const tbody = document.getElementById("rosterTableBody");
+    const countBadge = document.getElementById("rosterCountBadge");
+    const searchVal = (document.getElementById("searchRosterInput").value || "").toLowerCase().trim();
+
+    if (!selector || !tbody) return;
+    const selectedEventId = selector.value;
+
+    currentRosterList = [];
+
+    if (selectedEventId) {
+        try {
+            const token = localStorage.getItem("token");
+            const res = await fetch(`http://localhost:5000/api/organizer/events/${selectedEventId}/registrations`, {
+                headers: { "Authorization": `Bearer ${token}` }
+            });
+            const data = await res.json();
+            if (data.success && Array.isArray(data.data)) {
+                currentRosterList = data.data.map(r => ({
+                    id: r.register_number || `REG00${r.registration_id}`,
+                    name: r.name,
+                    dept: r.department || "General",
+                    email: r.email,
+                    date: r.registered_at ? new Date(r.registered_at).toLocaleDateString("en-US", { day: 'numeric', month: 'short', year: 'numeric' }) : "Recently",
+                    status: r.status || "Registered"
+                }));
+            }
+        } catch (e) {
+            console.error("Error fetching live registrations:", e);
+        }
+    }
+
+    const filtered = currentRosterList.filter(s =>
+        s.name.toLowerCase().includes(searchVal) ||
+        s.id.toLowerCase().includes(searchVal) ||
+        s.email.toLowerCase().includes(searchVal) ||
+        s.dept.toLowerCase().includes(searchVal)
+    );
+
+    if (countBadge) {
+        countBadge.textContent = `${filtered.length} Registered Students in Database`;
+    }
+
+    if (filtered.length === 0) {
+        tbody.innerHTML = `
+            <tr>
+                <td colspan="6" style="text-align: center; padding: 30px; color: var(--text-muted);">
+                    No student registrations found for this event in database.
+                </td>
+            </tr>
+        `;
+        return;
+    }
+
+    tbody.innerHTML = "";
+    filtered.forEach(s => {
+        tbody.innerHTML += `
+            <tr>
+                <td><strong>${s.id}</strong></td>
+                <td>${s.name}</td>
+                <td>${s.dept}</td>
+                <td>${s.email}</td>
+                <td>📅 ${s.date}</td>
+                <td><span class="status approved">✓ ${s.status}</span></td>
+            </tr>
+        `;
+    });
+}
+
+function filterRoster() {
+    loadRegistrations();
+}
+
+document.addEventListener("DOMContentLoaded", function () {
+    initEventSelector();
+});
+</script>
+
+</body>
+</html>

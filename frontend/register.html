@@ -1,0 +1,347 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <title>Create Account - Campus Event Management</title>
+
+    <link
+        rel="stylesheet"
+        href="css/register.css"
+    >
+
+</head>
+
+
+<body>
+
+    <div class="register-container">
+
+        <div class="register-card">
+
+            <div class="register-header">
+
+                <h1>Campus Events</h1>
+
+                <h2>Create Account</h2>
+
+                <p>
+                    Register to participate in campus events
+                </p>
+
+            </div>
+
+
+            <form id="registerForm">
+
+                <!-- Name -->
+
+                <div class="form-group">
+
+                    <label for="name">
+                        Full Name
+                    </label>
+
+                    <input
+                        type="text"
+                        id="name"
+                        placeholder="Enter your full name"
+                        required
+                    >
+
+                </div>
+
+
+                <!-- Email -->
+
+                <div class="form-group">
+
+                    <label for="email">
+                        Email
+                    </label>
+
+                    <input
+                        type="email"
+                        id="email"
+                        placeholder="Enter your email"
+                        required
+                    >
+
+                </div>
+
+
+                <!-- Password -->
+
+                <div class="form-group">
+
+                    <label for="password">
+                        Password
+                    </label>
+
+                    <input
+                        type="password"
+                        id="password"
+                        placeholder="Enter password"
+                        required
+                    >
+
+                </div>
+
+
+                <!-- Confirm Password -->
+
+                <div class="form-group">
+
+                    <label for="confirmPassword">
+                        Confirm Password
+                    </label>
+
+                    <input
+                        type="password"
+                        id="confirmPassword"
+                        placeholder="Confirm password"
+                        required
+                    >
+
+                </div>
+
+
+                <!-- Role -->
+
+                <div class="form-group">
+
+                    <label for="role">
+                        Account Type
+                    </label>
+
+                    <select id="role" required>
+
+                        <option value="">
+                            Select account type
+                        </option>
+
+                        <option value="STUDENT">
+                            Student
+                        </option>
+
+                        <option value="FACULTY">
+                            Faculty
+                        </option>
+
+                        <option value="ORGANIZER">
+                            Event Organizer
+                        </option>
+
+                    </select>
+
+                </div>
+
+
+                <!-- Student fields -->
+
+                <div
+                    id="studentFields"
+                    class="role-fields hidden"
+                >
+
+                    <h3>Student Information</h3>
+
+
+                    <div class="form-group">
+
+                        <label for="registerNumber">
+                            Register Number
+                        </label>
+
+                        <input
+                            type="text"
+                            id="registerNumber"
+                            placeholder="Example: CSE001"
+                        >
+
+                    </div>
+
+
+                    <div class="form-group">
+
+                        <label for="studentDepartment">
+                            Department
+                        </label>
+
+                        <input
+                            type="text"
+                            id="studentDepartment"
+                            placeholder="Example: CSE"
+                        >
+
+                    </div>
+
+
+                    <div class="form-group">
+
+                        <label for="studentYear">
+                            Year
+                        </label>
+
+                        <select id="studentYear">
+
+                            <option value="">
+                                Select year
+                            </option>
+
+                            <option value="1">
+                                1st Year
+                            </option>
+
+                            <option value="2">
+                                2nd Year
+                            </option>
+
+                            <option value="3">
+                                3rd Year
+                            </option>
+
+                            <option value="4">
+                                4th Year
+                            </option>
+
+                        </select>
+
+                    </div>
+
+                </div>
+
+
+                <!-- Faculty fields -->
+
+                <div
+                    id="facultyFields"
+                    class="role-fields hidden"
+                >
+
+                    <h3>Faculty Information</h3>
+
+
+                    <div class="form-group">
+
+                        <label for="facultyDepartment">
+                            Department
+                        </label>
+
+                        <input
+                            type="text"
+                            id="facultyDepartment"
+                            placeholder="Example: CSE"
+                        >
+
+                    </div>
+
+
+                    <div class="form-group">
+
+                        <label for="facultyInstitution">
+                            Institution
+                        </label>
+
+                        <input
+                            type="text"
+                            id="facultyInstitution"
+                            placeholder="Example: Main College"
+                        >
+
+                    </div>
+
+                </div>
+
+
+                <!-- Organizer fields -->
+
+                <div
+                    id="organizerFields"
+                    class="role-fields hidden"
+                >
+
+                    <h3>Organizer Information</h3>
+
+
+                    <div class="form-group">
+
+                        <label for="organizationName">
+                            Organization Name
+                        </label>
+
+                        <input
+                            type="text"
+                            id="organizationName"
+                            placeholder="Example: Cyber Security Club"
+                        >
+
+                    </div>
+
+
+                    <div class="form-group">
+
+                        <label for="organizerInstitution">
+                            Institution
+                        </label>
+
+                        <input
+                            type="text"
+                            id="organizerInstitution"
+                            placeholder="Example: Main College"
+                        >
+
+                    </div>
+
+                </div>
+
+
+                <!-- Message -->
+
+                <div
+                    id="message"
+                    class="message"
+                ></div>
+
+
+                <!-- Register button -->
+
+                <button
+                    type="submit"
+                    id="registerButton"
+                >
+                    Create Account
+                </button>
+
+
+            </form>
+
+
+            <div class="login-link">
+
+                <p>
+                    Already have an account?
+                    <a href="login.html">
+                        Login
+                    </a>
+                </p>
+
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <script src="js/register.js"></script>
+
+</body>
+
+</html>

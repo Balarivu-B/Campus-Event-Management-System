@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Campus Portal Login • Student, Faculty, Organizer & Admin</title>
+    <link rel="stylesheet" href="css/login.css">
+    <script src="js/theme.js"></script>
+</head>
+
+<body>
+
+<header class="login-nav">
+    <a href="index.html" class="login-nav-logo">
+        <span>🎪</span> CampusEvent
+    </a>
+    <button class="theme-toggle" id="themeToggle" aria-label="Toggle Theme">
+        <span class="theme-icon">🌙</span> <span class="theme-label">Dark Mode</span>
+    </button>
+</header>
+
+<main class="login-page">
+    <div class="login-box" style="max-width: 520px;">
+        <div class="login-header">
+            <div class="login-icon-badge">🏛️</div>
+            <h1>Campus Portal Login</h1>
+            <p>Enter your credentials to sign in to your dashboard</p>
+        </div>
+
+        <form id="loginForm">
+            <div class="form-group">
+                <label for="email">Campus Email Address</label>
+                <div class="input-wrapper">
+                    <input
+                        type="email"
+                        id="email"
+                        placeholder="Enter your email address"
+                        required
+                        autocomplete="email"
+                    >
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label for="password">Password</label>
+                <div class="input-wrapper">
+                    <input
+                        type="password"
+                        id="password"
+                        placeholder="Enter password"
+                        required
+                        autocomplete="current-password"
+                    >
+                    <button type="button" class="toggle-password-btn" id="togglePassword" title="Show/Hide Password">
+                        👁️
+                    </button>
+                </div>
+            </div>
+            <div class="register-link">
+
+    <p>
+        Don't have an account?
+        <a href="register.html">
+            Create Account
+        </a>
+    </p>
+
+</div>
+
+            <button type="submit">
+                <span>Sign In to Dashboard</span> →
+            </button>
+        </form>
+
+        <p id="loginMessage"></p>
+
+        <a href="index.html" class="back-link">
+            ← Back to Campus Home
+        </a>
+    </div>
+</main>
+
+<script src="js/login.js"></script>
+
+</body>
+</html>

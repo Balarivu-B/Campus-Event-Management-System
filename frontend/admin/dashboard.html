@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Dashboard • Campus Event Management</title>
+    <link rel="stylesheet" href="../css/admin.css">
+    <script src="../js/theme.js"></script>
+</head>
+<body>
+
+<div class="admin-layout">
+    <!-- SIDEBAR -->
+    <aside class="sidebar">
+        <div class="sidebar-header">
+            <div class="brand-icon">🛡️</div>
+            <div class="brand-text">
+                <h2>CampusEvent</h2>
+                <span class="role-badge">Super Admin</span>
+            </div>
+        </div>
+
+        <nav>
+            <a href="dashboard.html" class="active">
+                <span class="nav-icon">📊</span>
+                <span>Dashboard</span>
+            </a>
+            <a href="students.html">
+                <span class="nav-icon">🎓</span>
+                <span>Students</span>
+            </a>
+            <a href="faculty.html">
+                <span class="nav-icon">👨‍🏫</span>
+                <span>Faculty</span>
+            </a>
+            <a href="organizers.html">
+                <span class="nav-icon">🧑‍💼</span>
+                <span>Organizers</span>
+            </a>
+            <a href="events.html">
+                <span class="nav-icon">📅</span>
+                <span>Events</span>
+            </a>
+            <a href="reports.html">
+                <span class="nav-icon">📈</span>
+                <span>Reports</span>
+            </a>
+            <a href="notifications.html">
+                <span class="nav-icon">🔔</span>
+                <span>Notifications</span>
+            </a>
+            <a href="profile.html">
+                <span class="nav-icon">👤</span>
+                <span>Profile</span>
+            </a>
+        </nav>
+
+        <button onclick="logout()" class="logout-btn">
+            <span>🚪</span>
+            <span>Sign Out</span>
+        </button>
+    </aside>
+
+    <!-- MAIN CONTENT -->
+    <main class="main-content">
+        <header class="topbar">
+            <div class="topbar-title">
+                <h1>Admin Dashboard</h1>
+                <p>Campus system overview and executive management</p>
+            </div>
+
+            <div class="topbar-actions">
+                <button class="theme-toggle" id="themeToggle" aria-label="Toggle Theme">
+                    <span class="theme-icon">🌙</span>
+                    <span class="theme-label">Dark Mode</span>
+                </button>
+                <div class="admin-user-pill">
+                    <div class="admin-avatar">🛡️</div>
+                    <div class="admin-info">
+                        <span class="admin-name">System Admin</span>
+                        <span class="admin-role">Super Administrator</span>
+                    </div>
+                </div>
+            </div>
+        </header>
+
+        <!-- STATISTICS -->
+        <section class="stats">
+            <div class="stat-card">
+                <div class="stat-content">
+                    <h3>Total Students</h3>
+                    <p id="statStudents">...</p>
+                </div>
+                <div class="stat-icon">🎓</div>
+            </div>
+
+            <div class="stat-card">
+                <div class="stat-content">
+                    <h3>Total Faculty</h3>
+                    <p id="statFaculty">...</p>
+                </div>
+                <div class="stat-icon" style="background: rgba(37, 99, 235, 0.15); color: #2563eb;">👨‍🏫</div>
+            </div>
+
+            <div class="stat-card">
+                <div class="stat-content">
+                    <h3>Organizers</h3>
+                    <p id="statOrganizers">...</p>
+                </div>
+                <div class="stat-icon" style="background: rgba(2, 132, 199, 0.15); color: #0284c7;">🧑‍💼</div>
+            </div>
+
+            <div class="stat-card">
+                <div class="stat-content">
+                    <h3>Total Events</h3>
+                    <p id="statEvents">...</p>
+                </div>
+                <div class="stat-icon" style="background: rgba(16, 185, 129, 0.15); color: #10b981;">📅</div>
+            </div>
+        </section>
+
+        <!-- MANAGEMENT SHORTCUTS -->
+        <section class="content-section">
+            <h2><span>⚡</span> System Management Portals</h2>
+            <div class="management-grid">
+                <a href="students.html" class="management-card">
+                    <div class="card-head">
+                        <span class="card-icon">🎓</span>
+                    </div>
+                    <h3>Students</h3>
+                    <p>Manage student accounts and event permissions</p>
+                    <span class="card-arrow">Manage Students →</span>
+                </a>
+
+                <a href="faculty.html" class="management-card">
+                    <div class="card-head">
+                        <span class="card-icon">👨‍🏫</span>
+                    </div>
+                    <h3>Faculty</h3>
+                    <p>Manage department faculty coordinators</p>
+                    <span class="card-arrow">Manage Faculty →</span>
+                </a>
+
+                <a href="organizers.html" class="management-card">
+                    <div class="card-head">
+                        <span class="card-icon">🧑‍💼</span>
+                    </div>
+                    <h3>Organizers</h3>
+                    <p>Manage campus clubs and event organizers</p>
+                    <span class="card-arrow">Manage Organizers →</span>
+                </a>
+
+                <a href="events.html" class="management-card">
+                    <div class="card-head">
+                        <span class="card-icon">📅</span>
+                    </div>
+                    <h3>Events</h3>
+                    <p>Approve, cancel, and manage campus events</p>
+                    <span class="card-arrow">Manage Events →</span>
+                </a>
+            </div>
+        </section>
+
+        <!-- RECENT EVENTS -->
+        <section class="content-section">
+            <div class="content-section-header">
+                <h2><span>📋</span> Recent Campus Events</h2>
+                <a href="events.html" class="btn-view">View All Events →</a>
+            </div>
+
+            <div class="table-responsive">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Event Name</th>
+                            <th>Organizer</th>
+                            <th>Status</th>
+                            <th>Action</th>
+                        </tr>
+                    </thead>
+                    <tbody id="adminRecentEventsBody">
+                        <tr>
+                            <td colspan="4" style="text-align: center; padding: 25px; color: var(--text-muted);">
+                                Loading events from database...
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </section>
+    </main>
+</div>
+
+<script src="../js/session.js"></script>
+<script src="../js/admin.js"></script>
+</body>
+</html>

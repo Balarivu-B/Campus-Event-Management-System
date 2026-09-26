@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Faculty Profile • Campus Event Portal</title>
+    <link rel="stylesheet" href="../css/faculty.css">
+    <script src="../js/theme.js"></script>
+    <script src="../js/faculty.js"></script>
+</head>
+
+<body>
+
+<div class="layout">
+
+    <!-- SIDEBAR -->
+    <aside class="sidebar">
+        <div class="sidebar-logo">
+            <span>🎪</span> <span>CampusEvent</span>
+        </div>
+
+        <nav>
+            <a href="dashboard.html">
+                <span>🏠</span> <span>Dashboard</span>
+            </a>
+            <a href="event-requests.html">
+                <span>📋</span> <span>Event Requests</span>
+            </a>
+            <a href="approved-events.html">
+                <span>✅</span> <span>Approved Events</span>
+            </a>
+            <a href="reports.html">
+                <span>📊</span> <span>Reports</span>
+            </a>
+            <a href="notifications.html">
+                <span>🔔</span> <span>Notifications</span>
+            </a>
+            <a href="profile.html" class="active">
+                <span>👤</span> <span>Profile</span>
+            </a>
+        </nav>
+
+        <div class="sidebar-footer">
+            <a href="#" onclick="logout()" class="sidebar-logout">
+                <span>🚪</span> <span>Logout</span>
+            </a>
+        </div>
+    </aside>
+
+    <!-- MAIN CONTENT -->
+    <main class="main-content">
+        <header class="topbar">
+            <div class="topbar-left">
+                <h2>Faculty Profile</h2>
+                <p>Academic credentials, department role, and event coordination authority</p>
+            </div>
+
+            <div class="topbar-right">
+                <button class="theme-toggle" id="themeToggle" aria-label="Toggle Theme">
+                    <span class="theme-icon">🌙</span> <span class="theme-label">Dark Mode</span>
+                </button>
+
+                <div class="faculty-info">
+                    <div class="faculty-avatar">V</div>
+                    <span>Faculty Coordinator</span>
+                </div>
+            </div>
+        </header>
+
+        <!-- PROFILE CARD -->
+        <div class="profile-card">
+            <div class="profile-avatar-large faculty-avatar">
+                👨‍🏫
+            </div>
+
+            <div style="flex: 1;">
+                <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 6px; flex-wrap: wrap;">
+                    <h2 id="profFacultyName" style="font-size: 26px; font-weight: 800; color: var(--text-primary);">Dr. S. Venkatesh</h2>
+                    <span class="status approved">✓ Authorized Faculty Coordinator</span>
+                </div>
+                <p id="profFacultyDept" style="color: var(--text-secondary); font-size: 14px; margin-bottom: 12px;">
+                    Department of Computer Science and Engineering
+                </p>
+
+                <div style="display: flex; gap: 20px; flex-wrap: wrap; font-size: 13px; color: var(--text-muted);">
+                    <span>🆔 Role: <strong>FACULTY</strong></span>
+                    <span>✉️ Email: <strong id="profFacultyEmail">faculty@campus.edu</strong></span>
+                    <span>🏛️ Institution: <strong id="profFacultyInst">Main College Campus</strong></span>
+                </div>
+            </div>
+        </div>
+
+        <!-- STATS -->
+        <section class="stats">
+            <div class="stat-card">
+                <div class="stat-info">
+                    <h3 id="profilePendingCount">0</h3>
+                    <p>Pending Review</p>
+                </div>
+                <div class="stat-icon">⏳</div>
+            </div>
+
+            <div class="stat-card">
+                <div class="stat-info">
+                    <h3 id="profileApprovedCount">2</h3>
+                    <p>Approved Events</p>
+                </div>
+                <div class="stat-icon">✅</div>
+            </div>
+
+            <div class="stat-card">
+                <div class="stat-info">
+                    <h3>100%</h3>
+                    <p>Approval Clearance</p>
+                </div>
+                <div class="stat-icon">📈</div>
+            </div>
+
+            <div class="stat-card">
+                <div class="stat-info">
+                    <h3>0</h3>
+                    <p>Reports Reviewed</p>
+                </div>
+                <div class="stat-icon">📊</div>
+            </div>
+        </section>
+
+        <!-- DETAILS SECTION -->
+        <section class="dashboard-section">
+            <div class="section-heading">
+                <h2><span>🏛️</span> Faculty Departmental Information</h2>
+            </div>
+
+            <div class="profile-meta-grid">
+                <div class="profile-meta-item">
+                    <label>Full Name & Title</label>
+                    <p id="metaFacultyName">Dr. S. Venkatesh</p>
+                </div>
+
+                <div class="profile-meta-item">
+                    <label>Designation & Role</label>
+                    <p>Faculty Coordinator & Department Oversight</p>
+                </div>
+
+                <div class="profile-meta-item">
+                    <label>Department</label>
+                    <p id="metaFacultyDept">Computer Science and Engineering</p>
+                </div>
+
+                <div class="profile-meta-item">
+                    <label>Institution</label>
+                    <p id="metaFacultyInst">Main College Campus</p>
+                </div>
+
+                <div class="profile-meta-item">
+                    <label>Account Status</label>
+                    <p style="color: #16a34a; font-weight: 700;">Active in Database</p>
+                </div>
+
+                <div class="profile-meta-item">
+                    <label>Administrative Jurisdiction</label>
+                    <p>Campus Technical Fests, Workshops & Seminar Clearance</p>
+                </div>
+            </div>
+        </section>
+    </main>
+
+</div>
+
+<script src="../js/session.js"></script>
+<script>
+document.addEventListener("DOMContentLoaded", async function () {
+    const user = getLoggedInUser();
+    if (user) {
+        if (document.getElementById("profFacultyName")) document.getElementById("profFacultyName").textContent = user.name || "Faculty Coordinator";
+        if (document.getElementById("profFacultyDept")) document.getElementById("profFacultyDept").textContent = `Department of ${user.department || "Engineering"}`;
+        if (document.getElementById("profFacultyEmail")) document.getElementById("profFacultyEmail").textContent = user.email || "";
+        if (document.getElementById("profFacultyInst")) document.getElementById("profFacultyInst").textContent = user.institution || "Main Campus";
+        
+        if (document.getElementById("metaFacultyName")) document.getElementById("metaFacultyName").textContent = user.name || "";
+        if (document.getElementById("metaFacultyDept")) document.getElementById("metaFacultyDept").textContent = user.department || "General";
+        if (document.getElementById("metaFacultyInst")) document.getElementById("metaFacultyInst").textContent = user.institution || "Main Campus";
+    }
+
+    try {
+        const res = await fetch("http://localhost:5000/api/events");
+        const data = await res.json();
+        const approvedEvents = data.success && Array.isArray(data.data) ? data.data : [];
+        if (document.getElementById("profileApprovedCount")) {
+            document.getElementById("profileApprovedCount").textContent = approvedEvents.length;
+        }
+    } catch(e) {}
+});
+</script>
+
+</body>
+</html>

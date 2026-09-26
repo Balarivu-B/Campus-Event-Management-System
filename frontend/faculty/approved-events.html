@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Approved Events • Faculty Portal</title>
+    <link rel="stylesheet" href="../css/faculty.css">
+    <script src="../js/theme.js"></script>
+    <script src="../js/faculty.js"></script>
+</head>
+
+<body>
+
+<div class="layout">
+
+    <!-- SIDEBAR -->
+    <aside class="sidebar">
+        <div class="sidebar-logo">
+            <span>🎪</span> <span>CampusEvent</span>
+        </div>
+
+        <nav>
+            <a href="dashboard.html">
+                <span>🏠</span> <span>Dashboard</span>
+            </a>
+            <a href="event-requests.html">
+                <span>📋</span> <span>Event Requests</span>
+            </a>
+            <a href="approved-events.html" class="active">
+                <span>✅</span> <span>Approved Events</span>
+            </a>
+            <a href="reports.html">
+                <span>📊</span> <span>Reports</span>
+            </a>
+            <a href="notifications.html">
+                <span>🔔</span> <span>Notifications</span>
+            </a>
+            <a href="profile.html">
+                <span>👤</span> <span>Profile</span>
+            </a>
+        </nav>
+
+        <div class="sidebar-footer">
+            <a href="#" onclick="logout()" class="sidebar-logout">
+                <span>🚪</span> <span>Logout</span>
+            </a>
+        </div>
+    </aside>
+
+    <!-- MAIN CONTENT -->
+    <main class="main-content">
+        <header class="topbar">
+            <div class="topbar-left">
+                <h2>Approved Campus Events</h2>
+                <p>Events authorized for venue booking, budget, and campus attendance</p>
+            </div>
+
+            <div class="topbar-right">
+                <button class="theme-toggle" id="themeToggle" aria-label="Toggle Theme">
+                    <span class="theme-icon">🌙</span> <span class="theme-label">Dark Mode</span>
+                </button>
+
+                <div class="faculty-info">
+                    <div class="faculty-avatar">R</div>
+                    <span>Faculty Coordinator</span>
+                </div>
+            </div>
+        </header>
+
+        <section class="dashboard-section">
+            <div class="section-heading">
+                <h2><span>✅</span> Authorized & Scheduled Activities</h2>
+                <span id="approvedCountText" style="font-size: 13px; font-weight: 700; color: var(--text-secondary);"></span>
+            </div>
+
+            <div id="approvedEventsGrid" class="event-grid">
+                <!-- Populated dynamically via JS -->
+            </div>
+        </section>
+    </main>
+
+</div>
+
+<script src="../js/session.js"></script>
+<script>
+document.addEventListener("DOMContentLoaded", async function () {
+    const container = document.getElementById("approvedEventsGrid");
+    const countText = document.getElementById("approvedCountText");
+
+    let approvedList = [];
+    try {
+        const res = await fetch("http://localhost:5000/api/events");
+        const data = await res.json();
+        if (data.success && Array.isArray(data.data)) {
+            approvedList = data.data;
+        }
+    } catch (e) {
+        console.error("Error loading approved events:", e);
+    }
+
+    if (countText) {
+        countText.textContent = `${approvedList.length} Approved Events Active in Database`;
+    }
+
+    if (!container) return;
+
+    if (approvedList.length === 0) {
+        container.innerHTML = `
+            <div style="grid-column: 1 / -1; text-align: center; padding: 40px; color: var(--text-muted);">
+                <h3>No Approved Events Found</h3>
+                <p style="margin-top: 8px;">Review pending proposals to grant official campus clearance.</p>
+                <a href="event-requests.html" class="btn-secondary" style="margin-top: 15px; display: inline-flex;">
+                    Go to Pending Requests →
+                </a>
+            </div>
+        `;
+        return;
+    }
+
+    container.innerHTML = "";
+    approvedList.forEach(event => {
+        container.innerHTML += `
+            <div class="event-card">
+                <div>
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
+                        <span class="status approved">✓ Authorized</span>
+                        <span style="font-size: 12px; color: var(--text-muted); font-weight: 700;">${event.category || "General"}</span>
+                    </div>
+
+                    <h3>${event.name}</h3>
+
+                    <div style="margin-bottom: 15px;">
+                        <p><strong>Organizer:</strong> ${event.organizer || "Campus Club"}</p>
+                        <p>📅 <strong>${event.date}</strong></p>
+                        <p>⏰ ${event.time}</p>
+                        <p>📍 ${event.venue}</p>
+                        <p>👥 Expected Capacity: ${event.totalSeats || event.capacity} students</p>
+                    </div>
+                </div>
+
+                <div style="display: flex; gap: 8px; margin-top: 15px;">
+                    <a href="event-details.html?id=${event.id}" class="btn-secondary" style="width: 100%; text-align: center; text-decoration: none;">
+                        Inspect Proposal & Clearance
+                    </a>
+                </div>
+            </div>
+        `;
+    });
+});
+</script>
+
+</body>
+</html>

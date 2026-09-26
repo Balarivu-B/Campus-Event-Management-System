@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Event Requests • Faculty Portal</title>
+    <link rel="stylesheet" href="../css/faculty.css">
+    <script src="../js/theme.js"></script>
+    <script src="../js/session.js"></script>
+    <script src="../js/faculty.js"></script>
+</head>
+
+<body>
+
+<div class="layout">
+
+    <!-- SIDEBAR -->
+    <aside class="sidebar">
+        <div class="sidebar-logo">
+            <span>🎪</span> <span>CampusEvent</span>
+        </div>
+
+        <nav>
+            <a href="dashboard.html">
+                <span>🏠</span> <span>Dashboard</span>
+            </a>
+            <a href="event-requests.html" class="active">
+                <span>📋</span> <span>Event Requests</span>
+            </a>
+            <a href="approved-events.html">
+                <span>✅</span> <span>Approved Events</span>
+            </a>
+            <a href="reports.html">
+                <span>📊</span> <span>Reports</span>
+            </a>
+            <a href="notifications.html">
+                <span>🔔</span> <span>Notifications</span>
+            </a>
+            <a href="profile.html">
+                <span>👤</span> <span>Profile</span>
+            </a>
+        </nav>
+
+        <div class="sidebar-footer">
+            <a href="#" onclick="logout()" class="sidebar-logout">
+                <span>🚪</span> <span>Logout</span>
+            </a>
+        </div>
+    </aside>
+
+    <!-- MAIN CONTENT -->
+    <main class="main-content">
+        <header class="topbar">
+            <div class="topbar-left">
+                <h2>Event Proposals & Clearance</h2>
+                <p>Review student club applications, venue requests, and clearances</p>
+            </div>
+
+            <div class="topbar-right">
+                <button class="theme-toggle" id="themeToggle" aria-label="Toggle Theme">
+                    <span class="theme-icon">🌙</span> <span class="theme-label">Dark Mode</span>
+                </button>
+
+                <div class="faculty-info">
+                    <div class="faculty-avatar">R</div>
+                    <span>Faculty Coordinator</span>
+                </div>
+            </div>
+        </header>
+
+        <section class="dashboard-section">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; flex-wrap: wrap; gap: 14px;">
+                <input
+                    type="text"
+                    id="searchRequests"
+                    placeholder="Search requests by event title or club..."
+                    style="max-width: 320px; padding: 10px 14px; border: 1px solid var(--border-color); border-radius: 10px; background: var(--input-bg); color: var(--text-primary); font-family: inherit;"
+                    onkeyup="filterRequestsTable()"
+                >
+
+                <div style="display: flex; gap: 8px;">
+                    <button class="btn-secondary" onclick="setFilter('All', this)" style="background: var(--primary); color: white; border-color: var(--primary);">All</button>
+                    <button class="btn-secondary" onclick="setFilter('Pending', this)">Pending</button>
+                    <button class="btn-secondary" onclick="setFilter('Approved', this)">Approved</button>
+                    <button class="btn-secondary" onclick="setFilter('Rejected', this)">Rejected</button>
+                </div>
+            </div>
+
+            <div class="table-wrapper">
+                <table class="request-table">
+                    <thead>
+                        <tr>
+                            <th>Event Title</th>
+                            <th>Student Organizer</th>
+                            <th>Department</th>
+                            <th>Proposed Date</th>
+                            <th>Expected</th>
+                            <th>Status</th>
+                            <th>Action</th>
+                        </tr>
+                    </thead>
+                    <tbody id="requestsTableBody">
+                        <!-- Populated dynamically via JS -->
+                    </tbody>
+                </table>
+            </div>
+        </section>
+    </main>
+
+</div>
+
+<script>
+let activeFilter = "All";
+
+function renderRequestsTable() {
+    const requests = getFacultyRequests();
+    const tbody = document.getElementById("requestsTableBody");
+    const searchVal = (document.getElementById("searchRequests").value || "").toLowerCase().trim();
+
+    if (!tbody) return;
+
+    const filtered = requests.filter(req => {
+        const matchesFilter = activeFilter === "All" || req.status === activeFilter;
+        const matchesSearch = req.name.toLowerCase().includes(searchVal) ||
+                              req.organizer.toLowerCase().includes(searchVal) ||
+                              req.department.toLowerCase().includes(searchVal);
+        return matchesFilter && matchesSearch;
+    });
+
+    if (filtered.length === 0) {
+        tbody.innerHTML = `
+            <tr>
+                <td colspan="7" style="text-align: center; padding: 30px; color: var(--text-muted);">
+                    No event proposals matching current criteria.
+                </td>
+            </tr>
+        `;
+        return;
+    }
+
+    tbody.innerHTML = "";
+    filtered.forEach(req => {
+        let statusClass = "pending";
+        if (req.status === "Approved") statusClass = "approved";
+        if (req.status === "Rejected") statusClass = "rejected";
+
+        tbody.innerHTML += `
+            <tr>
+                <td><strong>${req.name}</strong></td>
+                <td>${req.organizer}</td>
+                <td>${req.department}</td>
+                <td>📅 ${req.date}</td>
+                <td>👥 ${req.participants}</td>
+                <td><span class="status ${statusClass}">${req.status}</span></td>
+                <td>
+                    <button onclick="viewRequest(${req.id})">
+                        Review →
+                    </button>
+                </td>
+            </tr>
+        `;
+    });
+}
+
+function filterRequestsTable() {
+    renderRequestsTable();
+}
+
+function setFilter(status, btn) {
+    activeFilter = status;
+    document.querySelectorAll(".btn-secondary").forEach(b => {
+        b.style.background = "";
+        b.style.color = "";
+        b.style.borderColor = "";
+    });
+    if (btn) {
+        btn.style.background = "var(--primary)";
+        btn.style.color = "#ffffff";
+        btn.style.borderColor = "var(--primary)";
+    }
+    renderRequestsTable();
+}
+
+document.addEventListener("DOMContentLoaded", async function () {
+    await loadFacultyRequestsFromDB();
+    renderRequestsTable();
+});
+</script>
+
+</body>
+</html>

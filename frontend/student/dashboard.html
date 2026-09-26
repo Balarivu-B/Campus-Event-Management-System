@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Student Dashboard • Campus Event Portal</title>
+    <link rel="stylesheet" href="../css/student.css">
+    <script src="../js/theme.js"></script>
+    <script src="../js/events-data.js"></script>
+</head>
+
+<body>
+
+<div class="layout">
+
+    <!-- SIDEBAR -->
+    <aside class="sidebar">
+        <div class="sidebar-logo">
+            <span>🎪</span> <span>CampusEvent</span>
+        </div>
+
+        <nav>
+            <a href="dashboard.html" class="active">
+                <span>🏠</span> <span>Dashboard</span>
+            </a>
+            <a href="events.html">
+                <span>📅</span> <span>Events</span>
+            </a>
+            <a href="my-events.html">
+                <span>📝</span> <span>My Events</span>
+            </a>
+            <a href="notifications.html">
+                <span>🔔</span> <span>Notifications</span>
+            </a>
+            <a href="feedback.html">
+                <span>⭐</span> <span>Feedback</span>
+            </a>
+            <a href="profile.html">
+                <span>👤</span> <span>Profile</span>
+            </a>
+        </nav>
+
+        <div class="sidebar-footer">
+            <a href="#" onclick="logout()" class="sidebar-logout">
+                <span>🚪</span> <span>Logout</span>
+            </a>
+        </div>
+    </aside>
+
+    <!-- MAIN CONTENT -->
+    <main class="main-content">
+        <header class="topbar">
+            <div class="topbar-left">
+                <h2>Student Dashboard</h2>
+                <p>Welcome back 👋 Here is your campus schedule</p>
+            </div>
+
+            <div class="topbar-right">
+                <button class="theme-toggle" id="themeToggle" aria-label="Toggle Theme">
+                    <span class="theme-icon">🌙</span> <span class="theme-label">Dark Mode</span>
+                </button>
+
+                <div class="student-info">
+                    <div class="student-avatar">A</div>
+                    <span>Student</span>
+                </div>
+            </div>
+        </header>
+
+        <!-- DYNAMIC STATISTICS -->
+        <section class="stats">
+            <div class="stat-card">
+                <div class="stat-info">
+                    <h3 id="statTotalEvents">0</h3>
+                    <p>Total Campus Events</p>
+                </div>
+                <div class="stat-icon">📅</div>
+            </div>
+
+            <div class="stat-card">
+                <div class="stat-info">
+                    <h3 id="statRegisteredEvents">0</h3>
+                    <p>My Registered Events</p>
+                </div>
+                <div class="stat-icon">🎟️</div>
+            </div>
+
+            <div class="stat-card">
+                <div class="stat-info">
+                    <h3 id="statUpcomingEvents">0</h3>
+                    <p>Upcoming This Month</p>
+                </div>
+                <div class="stat-icon">⚡</div>
+            </div>
+
+            <div class="stat-card">
+                <div class="stat-info">
+                    <h3 id="statFeedbacks">0</h3>
+                    <p>Feedbacks Shared</p>
+                </div>
+                <div class="stat-icon">⭐</div>
+            </div>
+        </section>
+
+        <!-- FEATURED UPCOMING EVENTS -->
+        <section class="dashboard-section">
+            <div class="section-heading">
+                <h2><span>🌟</span> Upcoming Highlights</h2>
+                <a href="events.html">View All Events →</a>
+            </div>
+
+            <div id="dashboardEvents" class="event-grid">
+                <!-- Injected dynamically via student.js -->
+            </div>
+        </section>
+
+        <!-- RECENT NOTIFICATIONS -->
+        <section class="dashboard-section">
+            <div class="section-heading">
+                <h2><span>🔔</span> Recent Campus Announcements</h2>
+                <a href="notifications.html">All Notifications →</a>
+            </div>
+
+            <div class="notification-item">
+                <div class="notification-content">
+                    <strong>Full-Stack Web Development Bootcamp Registration Open</strong>
+                    <p>Comprehensive practical workshop covering modern JavaScript, Express REST APIs, and database integration at Seminar Hall A.</p>
+                </div>
+                <span class="notification-time">Active in Database</span>
+            </div>
+
+            <div class="notification-item">
+                <div class="notification-content">
+                    <strong>AI & Cloud Innovation Summit 2026 Scheduled</strong>
+                    <p>Keynote sessions on reasoning models, autonomous systems, and enterprise cloud architecture at Main Auditorium.</p>
+                </div>
+                <span class="notification-time">Active in Database</span>
+            </div>
+        </section>
+    </main>
+
+</div>
+
+<script src="../js/session.js"></script>
+<script src="../js/events-data.js"></script>
+<script src="../js/student.js"></script>
+
+</body>
+</html>

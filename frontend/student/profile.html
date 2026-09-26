@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Student Profile • Campus Event Portal</title>
+    <link rel="stylesheet" href="../css/student.css">
+    <script src="../js/theme.js"></script>
+    <script src="../js/events-data.js"></script>
+</head>
+
+<body>
+
+<div class="layout">
+
+    <!-- SIDEBAR -->
+    <aside class="sidebar">
+        <div class="sidebar-logo">
+            <span>🎪</span> <span>CampusEvent</span>
+        </div>
+
+        <nav>
+            <a href="dashboard.html">
+                <span>🏠</span> <span>Dashboard</span>
+            </a>
+            <a href="events.html">
+                <span>📅</span> <span>Events</span>
+            </a>
+            <a href="my-events.html">
+                <span>📝</span> <span>My Events</span>
+            </a>
+            <a href="notifications.html">
+                <span>🔔</span> <span>Notifications</span>
+            </a>
+            <a href="feedback.html">
+                <span>⭐</span> <span>Feedback</span>
+            </a>
+            <a href="profile.html" class="active">
+                <span>👤</span> <span>Profile</span>
+            </a>
+        </nav>
+
+        <div class="sidebar-footer">
+            <a href="#" onclick="logout()" class="sidebar-logout">
+                <span>🚪</span> <span>Logout</span>
+            </a>
+        </div>
+    </aside>
+
+    <!-- MAIN CONTENT -->
+    <main class="main-content">
+        <header class="topbar">
+            <div class="topbar-left">
+                <h2>Student Profile</h2>
+                <p>Personal credentials, college verification, and campus engagement record</p>
+            </div>
+
+            <div class="topbar-right">
+                <button class="theme-toggle" id="themeToggle" aria-label="Toggle Theme">
+                    <span class="theme-icon">🌙</span> <span class="theme-label">Dark Mode</span>
+                </button>
+
+                <div class="student-info">
+                    <div class="student-avatar">S</div>
+                    <span>Student</span>
+                </div>
+            </div>
+        </header>
+
+        <!-- PROFILE HEADER CARD -->
+        <div class="profile-card">
+            <div class="profile-avatar-large student-avatar">
+                A
+            </div>
+
+            <div style="flex: 1;">
+                <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 6px; flex-wrap: wrap;">
+                    <h2 id="profStudentName" style="font-size: 26px; font-weight: 800; color: var(--text-primary);">Aarav Sharma</h2>
+                    <span class="registered-chip">✓ Verified Active Student</span>
+                </div>
+                <p id="profStudentDept" style="color: var(--text-secondary); font-size: 14px; margin-bottom: 12px;">
+                    Department of Computer Science and Engineering
+                </p>
+
+                <div style="display: flex; gap: 20px; flex-wrap: wrap; font-size: 13px; color: var(--text-muted);">
+                    <span>🆔 Register No: <strong id="profStudentReg">2026CSE001</strong></span>
+                    <span>✉️ Email: <strong id="profStudentEmail">student@campus.edu</strong></span>
+                    <span>🎓 Year: <strong id="profStudentYear">Year 3</strong></span>
+                </div>
+            </div>
+        </div>
+
+        <!-- STATS ROW -->
+        <section class="stats">
+            <div class="stat-card">
+                <div class="stat-info">
+                    <h3 id="profileRegCount">0</h3>
+                    <p>Registered Events</p>
+                </div>
+                <div class="stat-icon">🎟️</div>
+            </div>
+
+            <div class="stat-card">
+                <div class="stat-info">
+                    <h3 id="profileFeedCount">0</h3>
+                    <p>Reviews Given</p>
+                </div>
+                <div class="stat-icon">⭐</div>
+            </div>
+
+            <div class="stat-card">
+                <div class="stat-info">
+                    <h3>100%</h3>
+                    <p>System Compliance</p>
+                </div>
+                <div class="stat-icon">📈</div>
+            </div>
+
+            <div class="stat-card">
+                <div class="stat-info">
+                    <h3>0</h3>
+                    <p>Certificates Earned</p>
+                </div>
+                <div class="stat-icon">📜</div>
+            </div>
+        </section>
+
+        <!-- ACADEMIC & INSTITUTIONAL DETAILS -->
+        <section class="dashboard-section">
+            <div class="section-heading">
+                <h2><span>🏛️</span> Institutional Details</h2>
+            </div>
+
+            <div class="profile-meta-grid">
+                <div class="profile-meta-item">
+                    <label>Full Student Name</label>
+                    <p id="metaStudentName">Aarav Sharma</p>
+                </div>
+
+                <div class="profile-meta-item">
+                    <label>Enrollment Register No.</label>
+                    <p id="metaStudentReg">2026CSE001</p>
+                </div>
+
+                <div class="profile-meta-item">
+                    <label>Department</label>
+                    <p id="metaStudentDept">Computer Science and Engineering</p>
+                </div>
+
+                <div class="profile-meta-item">
+                    <label>Current Academic Year</label>
+                    <p id="metaStudentYear">Year 3</p>
+                </div>
+
+                <div class="profile-meta-item">
+                    <label>Database Account Status</label>
+                    <p style="color: #16a34a; font-weight: 700;">Active in Database</p>
+                </div>
+
+                <div class="profile-meta-item">
+                    <label>Campus Role</label>
+                    <p>Enrolled Student</p>
+                </div>
+            </div>
+        </section>
+    </main>
+
+</div>
+
+<script src="../js/session.js"></script>
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+    const user = getLoggedInUser();
+    if (user) {
+        if (document.getElementById("profStudentName")) document.getElementById("profStudentName").textContent = user.name || "Student";
+        if (document.getElementById("profStudentDept")) document.getElementById("profStudentDept").textContent = `Department of ${user.department || "General"}`;
+        if (document.getElementById("profStudentReg")) document.getElementById("profStudentReg").textContent = user.register_number || `ST00${user.user_id}`;
+        if (document.getElementById("profStudentEmail")) document.getElementById("profStudentEmail").textContent = user.email || "";
+        if (document.getElementById("profStudentYear")) document.getElementById("profStudentYear").textContent = `Year ${user.year || 1}`;
+
+        if (document.getElementById("metaStudentName")) document.getElementById("metaStudentName").textContent = user.name || "";
+        if (document.getElementById("metaStudentReg")) document.getElementById("metaStudentReg").textContent = user.register_number || `ST00${user.user_id}`;
+        if (document.getElementById("metaStudentDept")) document.getElementById("metaStudentDept").textContent = user.department || "General";
+        if (document.getElementById("metaStudentYear")) document.getElementById("metaStudentYear").textContent = `Year ${user.year || 1}`;
+    }
+
+    const regList = getRegisteredEventIds();
+    const feedbacks = JSON.parse(localStorage.getItem("feedbacks") || "[]");
+
+    const regEl = document.getElementById("profileRegCount");
+    const feedEl = document.getElementById("profileFeedCount");
+
+    if (regEl) regEl.textContent = regList.length;
+    if (feedEl) feedEl.textContent = feedbacks.length;
+});
+</script>
+
+</body>
+</html>

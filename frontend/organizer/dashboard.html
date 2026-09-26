@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Organizer Dashboard • Campus Event Portal</title>
+    <link rel="stylesheet" href="../css/organizer.css">
+    <script src="../js/theme.js"></script>
+    <script src="../js/session.js"></script>
+    <script src="../js/organizer.js"></script>
+</head>
+
+<body>
+
+<div class="layout">
+
+    <!-- SIDEBAR -->
+    <aside class="sidebar">
+        <div class="sidebar-logo">
+            <span>🎪</span> <span>CampusEvent</span>
+        </div>
+
+        <nav>
+            <a href="dashboard.html" class="active">
+                <span>🏠</span> <span>Dashboard</span>
+            </a>
+            <a href="create-event.html">
+                <span>➕</span> <span>Create Event</span>
+            </a>
+            <a href="my-events.html">
+                <span>📅</span> <span>My Events</span>
+            </a>
+            <a href="registrations.html">
+                <span>👥</span> <span>Registrations</span>
+            </a>
+            <a href="notifications.html">
+                <span>🔔</span> <span>Notifications</span>
+            </a>
+            <a href="profile.html">
+                <span>👤</span> <span>Profile</span>
+            </a>
+        </nav>
+
+        <div class="sidebar-footer">
+            <a href="#" onclick="logout()" class="sidebar-logout">
+                <span>🚪</span> <span>Logout</span>
+            </a>
+        </div>
+    </aside>
+
+    <!-- MAIN CONTENT -->
+    <main class="main-content">
+        <header class="topbar">
+            <div class="topbar-left">
+                <h2>Organizer Dashboard</h2>
+                <p>Welcome back! Here is your campus club overview and event schedule</p>
+            </div>
+
+            <div class="topbar-right">
+                <button class="theme-toggle" id="themeToggle" aria-label="Toggle Theme">
+                    <span class="theme-icon">🌙</span> <span class="theme-label">Dark Mode</span>
+                </button>
+
+                <div class="organizer-info">
+                    <div class="organizer-avatar">A</div>
+                    <span>Event Organizer</span>
+                </div>
+            </div>
+        </header>
+
+        <!-- STATISTICS -->
+        <section class="stats">
+            <div class="stat-card">
+                <div class="stat-info">
+                    <h3 id="statTotalEvents">0</h3>
+                    <p>Total Events</p>
+                </div>
+                <div class="stat-icon">📅</div>
+            </div>
+
+            <div class="stat-card">
+                <div class="stat-info">
+                    <h3 id="statApproved">0</h3>
+                    <p>Approved Events</p>
+                </div>
+                <div class="stat-icon">✅</div>
+            </div>
+
+            <div class="stat-card">
+                <div class="stat-info">
+                    <h3 id="statPending">0</h3>
+                    <p>Pending Faculty Clearance</p>
+                </div>
+                <div class="stat-icon">⏳</div>
+            </div>
+
+            <div class="stat-card">
+                <div class="stat-info">
+                    <h3 id="statRegistrations">0</h3>
+                    <p>Total Student Registrations</p>
+                </div>
+                <div class="stat-icon">👥</div>
+            </div>
+        </section>
+
+        <!-- QUICK ACTION -->
+        <section class="dashboard-section" style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 15px;">
+            <div>
+                <h3 style="font-size: 18px; margin-bottom: 4px; color: var(--text-primary);">Host a New Campus Event</h3>
+                <p style="color: var(--text-secondary); font-size: 13px;">Submit venue, date, and logistical requirements for faculty coordinator review.</p>
+            </div>
+            <a href="create-event.html" class="primary-btn" onclick="createEvent()">
+                <span>➕</span> Create New Event Proposal
+            </a>
+        </section>
+
+        <!-- MY EVENTS -->
+        <section class="dashboard-section">
+            <div class="section-heading">
+                <h2><span>🌟</span> Managed Event Catalog</h2>
+                <a href="my-events.html">View Full Catalog →</a>
+            </div>
+
+            <div id="dashboardEventGrid" class="event-grid">
+                <!-- Rendered dynamically via JS -->
+            </div>
+        </section>
+    </main>
+
+</div>
+
+<script src="../js/session.js"></script>
+<script>
+function refreshDashboard() {
+    const events = getOrganizerEvents();
+    const approved = events.filter(e => e.status === "Approved");
+    const pending = events.filter(e => e.status === "Pending");
+    const totalRegs = events.reduce((sum, e) => sum + (e.registrations || 0), 0);
+
+    // Update Stats
+    const totalEl = document.getElementById("statTotalEvents");
+    const appEl = document.getElementById("statApproved");
+    const penEl = document.getElementById("statPending");
+    const regEl = document.getElementById("statRegistrations");
+
+    if (totalEl) totalEl.textContent = events.length;
+    if (appEl) appEl.textContent = approved.length;
+    if (penEl) penEl.textContent = pending.length;
+    if (regEl) regEl.textContent = totalRegs;
+
+    // Render Event Cards
+    const container = document.getElementById("dashboardEventGrid");
+    if (container) {
+        container.innerHTML = "";
+        if (events.length === 0) {
+            container.innerHTML = `
+                <div style="grid-column: 1 / -1; text-align: center; padding: 30px; color: var(--text-muted);">
+                    <p>No campus events currently recorded in database. Click 'Create New Event Proposal' to submit one.</p>
+                </div>
+            `;
+            return;
+        }
+
+        events.forEach(event => {
+            let statusClass = "pending";
+            if (event.status === "Approved") statusClass = "approved";
+            if (event.status === "Rejected") statusClass = "rejected";
+
+            container.innerHTML += `
+                <div class="event-card">
+                    <div>
+                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
+                            <span class="status ${statusClass}">${event.status}</span>
+                            <span style="font-size: 12px; color: var(--text-muted); font-weight: 700;">${event.category || "General"}</span>
+                        </div>
+
+                        <h3>${event.name}</h3>
+
+                        <p>📅 <strong>${event.dateDisplay || event.date}</strong></p>
+                        <p>⏰ ${event.time || "Scheduled"}</p>
+                        <p>📍 ${event.venue}</p>
+                        <p>👥 <strong>${event.registrations || 0}</strong> / ${event.capacity} registered</p>
+                    </div>
+
+                    <div style="display: flex; gap: 8px; margin-top: 18px;">
+                        <button class="view-btn" onclick="viewEvent(${event.id})" style="flex: 1;">
+                            Inspect Details
+                        </button>
+                        <button class="edit-btn" onclick="editEvent(${event.id})">
+                            Edit
+                        </button>
+                    </div>
+                </div>
+            `;
+        });
+    }
+}
+
+document.addEventListener("DOMContentLoaded", async function () {
+    await loadOrganizerEventsFromDB();
+    refreshDashboard();
+});
+</script>
+
+</body>
+</html>
