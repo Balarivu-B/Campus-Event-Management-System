@@ -248,7 +248,7 @@ Database Name: `campus_event_management`
    PORT=5000
    DB_HOST=localhost
    DB_USER=root
-   DB_PASSWORD=root
+   DB_PASSWORD=our own database password
    DB_NAME=campus_event_management
    JWT_SECRET=campus_event_secret_123
 
